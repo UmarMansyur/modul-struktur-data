@@ -2,6 +2,8 @@
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 2–3 (Stack, Queue)
 
+> **Cara menjalankan:** kode dasar `graph.cpp` dan studi kasus `rute.cpp` sudah lengkap dengan `main`. Simpan utuh, lalu `g++ -std=c++17 graph.cpp -o graph` lalu `./graph` (sama untuk `rute.cpp`).
+
 ## 1. Capaian Pembelajaran
 
 1. Menjelaskan Vertex, Edge, Directed vs Undirected, Weighted vs Unweighted.
@@ -155,6 +157,8 @@ int main() {
   - DFS: 0 → tetangga 1 → tetangga 3 (mentok, backtrack) → 4 (mentok) → kembali ke 0 → tetangga 2 → 5 → `0 1 3 4 2 5` (menyelam!).
   - Perhatikan vertex sama, urutan beda — bukti karakteristik masing-masing.
 
+**Cara menjalankan kode dasar di atas:** simpan ke `graph.cpp`, lalu `g++ -std=c++17 graph.cpp -o graph` lalu `./graph`.
+
 **Contoh output:**
 ```
 BFS dari 0: 0 1 2 3 4 5
@@ -166,11 +170,88 @@ DFS dari 0: 0 1 3 4 2 5
 **Soal:** (1) dari seorang pengguna, temukan semua koneksi per derajat (teman, teman-dari-teman, ...); (2) pada peta kota tak-berbobot, cari rute pemberhentian tersedikit. Keduanya = BFS yang **mencatat jarak + predecessor**, bukan sekadar mencetak.
 
 ```cpp
-// Modifikasi BFS untuk menyimpan jarak & predecessor:
-vector<int> jarak(V, -1), prev(V, -1);
-// jarak[start] = 0; saat visit v dari u: jarak[v] = jarak[u]+1; prev[v] = u;
-// Rekonstruksi rute: telusuri prev dari target ke start, lalu balik.
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+// Simpan ke file rute.cpp — contoh utuh bisa langsung jalan.
+
+class GraphRute {
+    int V; vector<vector<int>> adj;
+public:
+    GraphRute(int v): V(v), adj(v) {}
+    void addEdge(int u, int v) { adj[u].push_back(v); adj[v].push_back(u); }
+
+    // BFS yang catat jarak + jalan kembali (prev)
+    void bfsJarak(int start, vector<int>& jarak, vector<int>& prev) {
+        jarak.assign(V, -1); prev.assign(V, -1);
+        queue<int> q;
+        jarak[start] = 0; q.push(start);
+        while (!q.empty()) {
+            int u = q.front(); q.pop();
+            for (int v : adj[u]) if (jarak[v] == -1) {
+                jarak[v] = jarak[u] + 1; // 1 jalan lebih jauh dari u
+                prev[v] = u;             // ingat: v ketemu dari u
+                q.push(v);
+            }
+        }
+    }
+    void cetakRute(int start, int target, vector<int>& prev) {
+        vector<int> jalan;
+        for (int p = target; p != -1; p = prev[p]) jalan.push_back(p);
+        reverse(jalan.begin(), jalan.end());
+        cout << "Rute " << start << " -> " << target << ": ";
+        for (int i = 0; i < jalan.size(); i++) {
+            cout << jalan[i];
+            if (i+1 < jalan.size()) cout << " -> ";
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    GraphRute g(7);
+    g.addEdge(0,1); g.addEdge(0,2); g.addEdge(1,3); g.addEdge(1,4);
+    g.addEdge(2,5); g.addEdge(4,5); g.addEdge(4,6); g.addEdge(5,6);
+    vector<int> jarak, prev;
+    g.bfsJarak(0, jarak, prev);
+    cout << "Jarak dari kota 0:" << endl;
+    for (int i = 0; i < 7; i++)
+        cout << " ke kota " << i << " = " << jarak[i] << " jalan" << endl;
+    g.cetakRute(0, 6, prev);
+    cout << "Jumlah pemberhentian 0->6 = " << jarak[6] << endl;
+    return 0;
+}
 ```
+
+**Cara menjalankan:**
+
+```bash
+g++ -std=c++17 rute.cpp -o rute
+./rute
+```
+
+**Output:**
+
+```text
+Jarak dari kota 0:
+ ke kota 0 = 0 jalan
+ ke kota 1 = 1 jalan
+ ke kota 2 = 1 jalan
+ ke kota 3 = 2 jalan
+ ke kota 4 = 2 jalan
+ ke kota 5 = 2 jalan
+ ke kota 6 = 3 jalan
+Rute 0 -> 6: 0 -> 1 -> 4 -> 6
+Jumlah pemberhentian 0->6 = 3
+```
+
+> **Kata sulit = arti mudah:**
+> - *Vertex (titik)* = kota / orang. *Edge (jalan)* = hubungan / jalan antara kota.
+> - *BFS (jalan melebar)* = cek semua tetangga dekat dulu baru yang jauh. Pakai antrean. Dijamin dapat yang terpendek.
+> - *DFS (jalan menyelam)* = ikut satu jalan sampai mentok baru balik. Pakai tumpukan. Cocok untuk cari jalan buntu.
+> - *Jarak* = jumlah jalan yang dilewati. *Prev (sebelumnya)* = ingatan "saya sampai sini dari mana" biar bisa susun rute pulang.
 
 **Penjelasan rancangan (untuk diimplementasikan sebagai Tugas 2):**
 

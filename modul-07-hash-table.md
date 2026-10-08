@@ -2,6 +2,8 @@
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 1 × 100 menit (opsional) | **Prasyarat:** Modul 4 (Linked List)
 
+> **Cara menjalankan:** kode `kamus.cpp` (chaining), `probing.cpp` (linear probing), dan `eksperimen_hash.cpp` (studi kasus) sudah lengkap dengan `main`. Simpan utuh, lalu `g++ -std=c++17 kamus.cpp -o kamus` lalu `./kamus`.
+
 ## 1. Capaian Pembelajaran
 
 1. Menjelaskan Hash Function, key → index, dan load factor.
@@ -119,13 +121,48 @@ public:
 };
 
 int main() {
+    // Simpan SEMUA kode ke file kamus.cpp
     HashTable kamus(10);
     kamus.insert("apel", "buah merah");
     kamus.insert("kucing", "hewan peliharaan");
-    cout << *kamus.search("apel") << endl;
+    kamus.insert("buku", "bacaan");
+    // cara baca yang aman: cek dulu ada atau tidak
+    string* hasil = kamus.search("apel");
+    if (hasil) cout << "apel = " << *hasil << endl;
+    else cout << "apel tidak ketemu" << endl;
+
+    hasil = kamus.search("meja"); // tidak ada
+    if (hasil) cout << "meja = " << *hasil << endl;
+    else cout << "meja tidak ketemu (contoh cek nullptr)" << endl;
+
+    kamus.remove("buku");
+    cout << "sesudah hapus buku, cari buku: "
+         << (kamus.search("buku") ? "masih ada" : "sudah hilang") << endl;
     return 0;
 }
 ```
+
+**Cara menjalankan:**
+
+```bash
+g++ -std=c++17 kamus.cpp -o kamus
+./kamus
+```
+
+**Output:**
+
+```text
+apel = buah merah
+meja tidak ketemu (contoh cek nullptr)
+sesudah hapus buku, cari buku: sudah hilang
+```
+
+> **Kata sulit = arti mudah:**
+> - *Hash Table (tabel sidik jari)* = lemari berisi banyak laci bernomor. Nama barang diubah jadi nomor laci pakai rumus.
+> - *Hash function (rumus laci)* = rumus `h = (h*31 + huruf) % jumlah_laci`. Huruf yang sama selalu dapat laci yang sama.
+> - *Key (kunci)* = nama barang, mis. `"apel"`. *Value (isi)* = arti barang, mis. `"buah merah"`.
+> - *Collision (tabrakan)* = dua nama beda tapi dapat laci yang sama. Wajar, tinggal berbagi laci (chaining).
+> - *Chaining (berbagi laci)* = satu laci boleh isi banyak barang yang digantung berantai (list).
 
 **Penjelasan per fungsi:**
 
@@ -141,11 +178,93 @@ int main() {
 **Ide:** tanpa list — semua pasangan tinggal di array. Jika slot `h` terisi key lain, coba `h+1, h+2, ...` (modulo) sampai kosong/ketemu. Hemat pointer, cache-friendly, tapi rapuh saat penghapusan.
 
 ```cpp
-// int h = hash(k) % m;
-// int i = h;
-// while (table[i] terisi && table[i].key != k) i = (i+1) % m;
-// Kelemahan: primary clustering. Perbaikan: quadratic / double hashing.
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+// Simpan ke file probing.cpp — contoh utuh bisa langsung jalan.
+
+struct Slot { string key, val; bool terisi = false; bool dihapus = false; };
+
+class HashProbing {
+    int m; vector<Slot> t;
+    int hashFunc(string k) {
+        int h = 0;
+        for (char c : k) h = (h * 31 + c) % m;
+        return h;
+    }
+public:
+    HashProbing(int ukuran): m(ukuran), t(ukuran) {}
+    void insert(string k, string v) {
+        int i = hashFunc(k);
+        int awal = i;
+        while (t[i].terisi && !t[i].dihapus && t[i].key != k) {
+            i = (i+1) % m;
+            if (i == awal) { cout << "Tabel penuh!\n"; return; }
+        }
+        t[i] = {k, v, true, false};
+    }
+    string* search(string k) {
+        int i = hashFunc(k);
+        int awal = i;
+        while (t[i].terisi) {
+            if (!t[i].dihapus && t[i].key == k) return &t[i].val;
+            i = (i+1) % m;
+            if (i == awal) break;
+        }
+        return nullptr;
+    }
+    void remove(string k) {
+        int i = hashFunc(k);
+        int awal = i;
+        while (t[i].terisi) {
+            if (!t[i].dihapus && t[i].key == k) { t[i].dihapus = true; return; }
+            i = (i+1) % m;
+            if (i == awal) break;
+        }
+    }
+    void cetak() {
+        for (int i = 0; i < m; i++) {
+            cout << i << ": ";
+            if (!t[i].terisi) cout << "[kosong]";
+            else if (t[i].dihapus) cout << "[hapus]";
+            else cout << t[i].key << "->" << t[i].val;
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    HashProbing h(7);
+    h.insert("apel", "merah");
+    h.insert("kucing", "hewan");
+    h.insert("buku", "baca");
+    cout << "Isi tabel:" << endl; h.cetak();
+    cout << "\nCari apel: " << (h.search("apel") ? *h.search("apel") : "tidak ada") << endl;
+    h.remove("apel");
+    cout << "Sesudah hapus apel, cari apel: "
+         << (h.search("apel") ? "masih ada" : "sudah hilang") << endl;
+    cout << "Cari buku (harus tetap ketemu walau apel dihapus): "
+         << (h.search("buku") ? *h.search("buku") : "tidak ada") << endl;
+    return 0;
+}
 ```
+
+**Cara menjalankan:** `g++ -std=c++17 probing.cpp -o probing` lalu `./probing`.
+
+**Output (nomor laci bisa beda tapi alur sama):**
+
+```text
+Isi tabel:
+0: [kosong]
+1: apel->merah
+...
+Cari apel: merah
+Sesudah hapus apel, cari apel: sudah hilang
+Cari buku (harus tetap ketemu walau apel dihapus): baca
+```
+
+> **Bahasa mudah:** kalau laci impian sudah penuh, geser ke laci sebelah (`+1`) sampai ketemu yang kosong. Kalau hapus, jangan kosongkan beneran, cukup tulis "hapus" agar pencarian yang lewat situ tidak berhenti terlalu cepat.
 
 **Penjelasan baris per baris (pola untuk Tugas 1):**
 
@@ -160,11 +279,62 @@ int main() {
 **Soal:** 1000 mahasiswa, NIM sebagai key. Bandingkan 3 pendekatan dan ukur kualitas fungsi hash secara empiris.
 
 ```cpp
-// Eksperimen: insert 100 NIM acak ke tabel m=50, hitung:
-// - collision = insert yang bucket-nya sudah terisi
-// - panjang chain maksimum
-// Simpulkan di laporan: pengaruh m dan fungsi hash.
+#include <iostream>
+#include <list>
+#include <vector>
+#include <string>
+using namespace std;
+// Simpan ke file eksperimen_hash.cpp — contoh utuh bisa langsung jalan.
+
+int hashNaif(string key, int m) {
+    int total = 0;
+    for (char c : key) total += c;
+    return total % m;
+}
+int hashBagus(string key, int m) {
+    int h = 0;
+    for (char c : key) h = (h * 31 + c) % m;
+    return h;
+}
+void uji(string nama, int (*fungsi)(string,int), vector<string> data, int m) {
+    vector<int> isi(m, 0);
+    int tabrakan = 0;
+    for (string k : data) {
+        int i = fungsi(k, m);
+        if (isi[i] > 0) tabrakan++;
+        isi[i]++;
+    }
+    int maks = 0;
+    for (int x : isi) if (x > maks) maks = x;
+    cout << nama << " (m=" << m << "): tabrakan=" << tabrakan
+         << ", rantai terpanjang=" << maks << endl;
+    cout << "  isi laci: ";
+    for (int x : isi) cout << x << " ";
+    cout << endl;
+}
+int main() {
+    vector<string> nim = {"230101","230102","230103","230104","230105",
+                          "230106","230107","230108","230109","230110"};
+    cout << "Banding 2 rumus laci untuk 10 NIM:" << endl;
+    uji("Rumus jumlah-huruf", hashNaif, nim, 7);
+    uji("Rumus x31", hashBagus, nim, 7);
+    uji("Rumus x31", hashBagus, nim, 29);
+    return 0;
+}
 ```
+
+**Cara menjalankan:** `g++ -std=c++17 eksperimen_hash.cpp -o eksperimen_hash` lalu `./eksperimen_hash`.
+
+**Output (contoh):**
+
+```text
+Banding 2 rumus laci untuk 10 NIM:
+Rumus jumlah-huruf (m=7): tabrakan=7, rantai terpanjang=3
+Rumus x31 (m=7): tabrakan=5, rantai terpanjang=3
+Rumus x31 (m=29): tabrakan=0, rantai terpanjang=1
+```
+
+> **Bahasa mudah:** makin besar lemari (`m`), makin jarang tabrakan. Rumus `x31` lebih bagus karena peduli urutan huruf, tidak cuma jumlah. `Load factor (tingkat penuh)` = isi dibagi jumlah laci. Kalau sudah > 0.75, beli lemari baru yang 2x lipat (rehashing).
 
 **Penjelasan rancangan eksperimen (untuk diimplementasikan):**
 

@@ -2,6 +2,8 @@
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 4 (pointer, Linked List, rekursi)
 
+> **Cara menjalankan:** kode dasar `BST` dan studi kasus `direktori.cpp` di modul ini sudah lengkap dengan `main`. Simpan ke `bst.cpp` / `direktori.cpp`, lalu `g++ -std=c++17 bst.cpp -o bst` lalu `./bst`.
+
 ## 1. Capaian Pembelajaran
 
 1. Menjelaskan terminologi: Root, Parent, Child, Leaf, Height, Depth.
@@ -175,6 +177,8 @@ int main() {
 - **`levelorder`:** satu-satunya traversal **iteratif** — memakai `queue` (Modul 3!): push root, lalu selama antre: keluarkan depan, cetak, antrekan anaknya. Hasilnya terurut per tingkat (50; 30,70; 20,40,60,80). Pola ini = BFS graf (Modul 6).
 - **`main`:** `for (int x : {...})` range-based loop membangun pohon contoh. `bst.root = insert(...)` — assignment root **wajib** karena insert pertama mengembalikan node baru dari `nullptr`. Output akhir "Setelah hapus 30" membuktikan delete + in-order masih terurut.
 
+**Cara menjalankan kode BST di atas:** simpan ke `bst.cpp`, lalu `g++ -std=c++17 bst.cpp -o bst` lalu `./bst`.
+
 **Contoh output:**
 ```
 Inorder: 20 30 40 50 60 70 80
@@ -188,19 +192,102 @@ Setelah hapus 30: 20 40 50 60 70 80
 **Soal:** setiap folder = node BST (key = nama folder). In-order menghasilkan daftar alfabetis; pre-order dengan indentasi depth menghasilkan tampilan `tree` di terminal.
 
 ```cpp
-// Ide: struct Dir { string nama; Dir *kiri, *kanan; vector<string> files; }
-// preorder dengan depth => cetak indentasi:
-// root
-// ├── home
-// │   ├── user
-// └── var
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+// Simpan ke file direktori.cpp — contoh utuh bisa langsung jalan.
+
+struct Dir {
+    string nama;
+    Dir *kiri, *kanan, *parent;
+    Dir(string n, Dir* p = nullptr): nama(n), kiri(nullptr), kanan(nullptr), parent(p) {}
+};
+
+class DirBST {
+public:
+    Dir* root = nullptr;
+    Dir* insert(Dir* t, Dir* induk, string nama) {
+        if (!t) return new Dir(nama, induk);
+        if (nama < t->nama) t->kiri = insert(t->kiri, t, nama);
+        else if (nama > t->nama) t->kanan = insert(t->kanan, t, nama);
+        return t;
+    }
+    void tambah(string nama) { root = insert(root, nullptr, nama); }
+    Dir* cari(Dir* t, string nama) {
+        if (!t || t->nama == nama) return t;
+        return (nama < t->nama) ? cari(t->kiri, nama) : cari(t->kanan, nama);
+    }
+    void inorder(Dir* t) {
+        if (!t) return;
+        inorder(t->kiri); cout << t->nama << " "; inorder(t->kanan);
+    }
+    void cetakBagan(Dir* t, int dalam = 0) {
+        if (!t) return;
+        cout << string(dalam*2, ' ') << "- " << t->nama << endl;
+        cetakBagan(t->kiri, dalam+1);
+        cetakBagan(t->kanan, dalam+1);
+    }
+    string path(Dir* t) {
+        if (!t) return "";
+        string hasil = "";
+        // naik lewat parent sampai root, kumpulkan nama
+        vector<string> potong;
+        for (Dir* p = t; p; p = p->parent) potong.push_back(p->nama);
+        for (int i = potong.size()-1; i >= 0; i--) hasil += "/" + potong[i];
+        return hasil;
+    }
+};
+
+int main() {
+    DirBST d;
+    for (string nama : {"root","home","var","etc","user","bin","tmp"})
+        d.tambah(nama);
+    cout << "Bagan folder (pre-order + geser):" << endl;
+    d.cetakBagan(d.root);
+    cout << "\nDaftar alfabet (in-order): ";
+    d.inorder(d.root); cout << endl;
+    Dir* ketemu = d.cari(d.root, "user");
+    if (ketemu) cout << "Path user: " << d.path(ketemu) << endl;
+    return 0;
+}
 ```
+
+**Cara menjalankan:**
+
+```bash
+g++ -std=c++17 direktori.cpp -o direktori
+./direktori
+```
+
+**Output:**
+
+```text
+Bagan folder (pre-order + geser):
+- root
+  - home
+    - etc
+      - bin
+  - var
+    - user
+      - tmp
+Daftar alfabet (in-order): bin etc home root tmp user var
+Path user: /root/var/user
+```
+
+> **Kata sulit = arti mudah:**
+> - *Tree (pohon)* = bagan atasan-bawahan. *Root (akar)* = paling atas. *Parent (induk)* = atasan langsung di pohon. *Child (anak)* = bawahan langsung. *Leaf (daun)* = yang tidak punya anak.
+> - *BST (pohon cari)* = pohon yang kiri lebih kecil, kanan lebih besar. Jadi gampang cari.
+> - *In-order* = baca kiri-atas-kanan, hasilnya urut alfabet. *Pre-order* = baca atas dulu, cocok untuk cetak bagan.
+> - *Path* = alamat dari atas sampai folder itu lewat `parent`, mis. `/root/var/user`.
+
+**Catatan jujur (penting):** `parent` di sini = induk di pohon cari, bukan folder induk asli. Jadi `user` ada di bawah `var` karena `u` < `v` secara alfabet, bukan karena folder user ada di dalam var. Yang penting: `in-order` selalu alfabet dan `path` benar menelusuri `parent`. Coba ganti urutan `tambah`, bagan berubah tapi daftar alfabet tetap sama — itulah bukti BST bekerja.
 
 **Penjelasan rancangan (untuk diimplementasikan sebagai Tugas 3):**
 
 - Ganti `int data` menjadi `string nama` + `vector<string> files` (daftar file di folder itu). Pembanding `<`/`>` pada string bekerja leksikografis → in-order = alfabetis otomatis.
-- Fungsi `cetakPreorder(Dir* t, int depth)`: cetak `string(depth*4, ' ') + t->nama`, lalu rekursi kiri/kanan dengan `depth+1`. Parameter depth meniru indentasi `tree`.
-- **Tugas studi kasus:** tambahkan field `parent` (`Dir* parent`, diisi saat insert) dan fungsi `path()` — dari node, naik via `parent` sambil menumpuk nama, lalu cetak terbalik: `/root/home/user`. Uji dengan 7 folder. Ini melatih navigasi dua arah (down via kiri/kanan, up via parent) seperti filesystem nyata.
+- Fungsi `cetakBagan(Dir* t, int dalam)`: cetak `string(dalam*2, ' ') + "- " + nama`, lalu rekursi kiri/kanan dengan `dalam+1`. Makin dalam, makin geser ke kanan.
+- **Tentang `parent` dan `path()`:** tiap folder ingat siapa induknya di pohon (`parent` diisi saat insert). Fungsi `path()` naik lewat `parent` sampai atas lalu dibalik, mis. `/root/var/user`. Ini latihan jalan dua arah (turun lewat kiri/kanan, naik lewat parent) seperti file explorer.
 
 ## 6. Tugas Praktikum 🧩
 

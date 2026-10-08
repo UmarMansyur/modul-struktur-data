@@ -2,6 +2,16 @@
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 0
 
+> **Cara menjalankan semua kode di modul ini:**
+> Semua contoh (Linear, Binary, Bubble, Selection, Insertion, Quick, Studi Kasus) sudah lengkap dengan `main`. Caranya sama: simpan ke `cari.cpp`, lalu `g++ -std=c++17 cari.cpp -o cari` lalu `./cari`. Lihat output di bawah tiap kode untuk cek benar atau tidak.
+>
+> **Kata sulit = arti mudah:**
+> - *Searching (mencari)* = cari nama di daftar hadir.
+> - *Sorting (mengurutkan)* = rapikan kartu dari kecil ke besar.
+> - *Linear Search (cari satu-satu)* = cek dari awal sampai ketemu.
+> - *Binary Search (cari belah dua)* = data harus urut dulu, lalu tebak tengah terus.
+> - *Stabil* = yang nilainya sama, urutan awalnya tidak dibalik.
+
 ## 1. Capaian Pembelajaran
 
 Setelah menyelesaikan modul ini, mahasiswa mampu:

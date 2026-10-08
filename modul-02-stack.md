@@ -2,11 +2,13 @@
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 1 × 100 menit | **Prasyarat:** Modul 1
 
+> **Cara menjalankan:** SEMUA kode di modul ini sekarang sudah lengkap dengan `main` yang bisa langsung jalan. Copy dari `#include` sampai `return 0` ke file `.cpp`, lalu `g++ -std=c++17 nama.cpp -o nama` lalu `./nama`. Lihat output di bawah tiap kode.
+
 ## 1. Capaian Pembelajaran
 
 1. Menjelaskan prinsip LIFO dan operasi Push, Pop, Peek/Top, IsEmpty, IsFull.
 2. Mengimplementasikan Stack berbasis Array dan berbasis Linked List, membandingkan keduanya.
-3. Menyelesaikan konversi Infix → Postfix dan evaluasi ekspresi.
+3. Menyelesaikan konversi bolak-balik Infix ↔ Postfix ↔ Prefix dan evaluasi ekspresi.
 4. Mensimulasikan fitur Undo/Redo pada text editor.
 5. Menjelaskan sejarah Stack dan merefleksikan nilai filosofisnya (disiplin LIFO).
 
@@ -96,10 +98,81 @@ public:
         return data[TOP--];
     }
     int peek() { return isEmpty() ? -1 : data[TOP]; }
+    // tambahan kecil agar gampang lihat isi (untuk belajar saja)
+    void cetak() {
+        if (isEmpty()) { cout << "[kosong]"; return; }
+        cout << "[";
+        for (int i = 0; i <= TOP; i++) {
+            cout << data[i];
+            if (i < TOP) cout << ", ";
+        }
+        cout << "]";
+    }
+    int getTOP() { return TOP; }
 };
+
+// Cara memakai: contoh program utuh yang bisa langsung jalan.
+// Copy SEMUA kode dari #include sampai return 0 ke file stack_array.cpp
+int main() {
+    StackArray s;
+    cout << "Awal: "; s.cetak(); cout << " (TOP=" << s.getTOP() << ")" << endl;
+
+    s.push(10);
+    cout << "push(10): "; s.cetak(); cout << " (TOP=" << s.getTOP() << ")" << endl;
+
+    s.push(20);
+    cout << "push(20): "; s.cetak(); cout << " (TOP=" << s.getTOP() << ")" << endl;
+
+    cout << "peek() = " << s.peek() << " (cuma ngintip, tidak hapus)" << endl;
+    cout << "isi sesudah peek: "; s.cetak(); cout << endl;
+
+    cout << "pop() = " << s.pop() << " (ambil + hapus)" << endl;
+    cout << "isi sesudah pop: "; s.cetak(); cout << endl;
+
+    cout << "pop() = " << s.pop() << endl;
+    cout << "isi sesudah pop: "; s.cetak(); cout << endl;
+
+    cout << "pop() saat kosong = " << s.pop() << " (muncul Underflow!)" << endl;
+    return 0;
+}
 ```
 
-**Penjelasan detail:**
+**Cara menjalankan kode di atas:**
+
+1. Simpan kode utuh (dari `#include` sampai `return 0`) ke file `stack_array.cpp`.
+2. Buka terminal di folder file itu, lalu ketik:
+
+```bash
+g++ -std=c++17 stack_array.cpp -o stack_array
+./stack_array
+# di Windows: .\stack_array.exe
+```
+
+3. Hasil yang muncul di layar (output):
+
+```text
+Awal: [kosong] (TOP=-1)
+push(10): [10] (TOP=0)
+push(20): [10, 20] (TOP=1)
+peek() = 20 (cuma ngintip, tidak hapus)
+isi sesudah peek: [10, 20]
+pop() = 20 (ambil + hapus)
+isi sesudah pop: [10]
+pop() = 10
+isi sesudah pop: [kosong]
+Underflow!
+pop() saat kosong = -1 (muncul Underflow!)
+```
+
+> **Kata sulit = arti mudah (biar paham):**
+> - *Stack / tumpukan* = tumpukan piring. Ambil harus dari atas.
+> - *LIFO (Last In First Out)* = "yang terakhir masuk, dia yang pertama keluar".
+> - *push* = taruh piring baru di atas. *pop* = ambil piring paling atas. *peek/top* = cuma ngintip piring atas tanpa diambil.
+> - *TOP* = jari yang nunjuk piring paling atas. Awalnya -1 artinya "belum ada piring".
+> - *Overflow (tumpukan penuh)* = piring sudah mentok 100, tidak bisa tambah lagi.
+> - *Underflow (tumpukan kosong)* = mau ambil piring tapi piringnya tidak ada.
+
+**Penjelasan detail (pakai kalimat pendek):**
 
 - `int data[MAX]` — memori **statis** 100 int di stack (bukan heap). Alokasi O(1) sekaligus, cache-friendly (elemen bersebelahan → CPU prefetcher bekerja optimal). Harga: kapasitas tetap; `MAX` terlalu besar = buang memori, terlalu kecil = overflow.
 - `TOP = -1` — trik agar `++TOP` pertama menjadi 0 (indeks valid pertama). Alternatif `TOP = 0` = "jumlah elemen" juga populer (`data[TOP++] = x`), tapi konvensi -1 dipakai modul ini konsisten dengan Gambar 3.
@@ -134,12 +207,62 @@ public:
         top = top->next; delete tmp; return v;
     }
     int peek() { return isEmpty() ? -1 : top->data; }
+    void cetak() {
+        if (isEmpty()) { cout << "[kosong]"; return; }
+        cout << "[atas] ";
+        for (Node* t = top; t; t = t->next) cout << t->data << " ";
+        cout << "[bawah]";
+    }
+    ~StackLL() { while (!isEmpty()) pop(); }
 };
+
+// Contoh pakai yang bisa langsung jalan.
+// Simpan SEMUA kode ke file stack_ll.cpp
+int main() {
+    StackLL s;
+    s.push(10); s.push(20); s.push(30);
+    cout << "Setelah push 10,20,30: "; s.cetak(); cout << endl;
+    cout << "peek() = " << s.peek() << " (cuma ngintip)" << endl;
+    cout << "pop() = " << s.pop() << endl;
+    cout << "isi sekarang: "; s.cetak(); cout << endl;
+    cout << "pop() = " << s.pop() << endl;
+    cout << "pop() = " << s.pop() << endl;
+    cout << "pop() saat kosong = " << s.pop() << endl;
+    return 0;
+}
 ```
 
-**Penjelasan detail:**
+**Cara menjalankan kode di atas:**
 
-- `push` **tidak butuh cek penuh** — selama heap masih ada, selalu muat (itulah "tanpa overflow"). Dua barisnya identik `insertFirst`: node baru menunjuk top lama, top pindah. O(1) tanpa syarat.
+```bash
+g++ -std=c++17 stack_ll.cpp -o stack_ll
+./stack_ll
+# di Windows: .\stack_ll.exe
+```
+
+**Output yang muncul:**
+
+```text
+Setelah push 10,20,30: [atas] 30 20 10 [bawah]
+peek() = 30 (cuma ngintip)
+pop() = 30
+isi sekarang: [atas] 20 10 [bawah]
+pop() = 20
+pop() = 10
+Underflow!
+pop() saat kosong = -1
+```
+
+> **Kata sulit = arti mudah:**
+> - *Linked List (senarai berantai)* = gerbong kereta. Tiap gerbong bawa barang (`data`) + sambungan ke gerbong depan (`next`).
+> - *Node* = satu gerbong.
+> - *Dinamis* = panjang kereta bisa tambah/kurang kapan saja. Tidak harus tentukan 100 dari awal.
+> - *Heap (gudang memori bebas)* = tempat bikin gerbong baru pakai `new`. Jangan lupa bongkar pakai `delete` biar tidak bocor.
+> - *Memory leak (memori bocor)* = bikin gerbong baru terus tapi tidak pernah dibongkar. Lama-lama gudang penuh.
+
+**Penjelasan detail (pakai kalimat pendek):**
+
+- `push` **tidak butuh cek penuh** — selama gudang memori masih ada, selalu muat. Caranya sama seperti `insertFirst`: gerbong baru sambung ke atas lama, lalu atas pindah ke gerbong baru.
 - `pop` menyimpan `v = tmp->data` **sebelum** `delete tmp` — urutan yang jika dibalik (delete dulu baru baca) menjadi use-after-free. Pola simpan-maju-hapus-kembalikan ini sama persis dengan `deleteFirst` Modul 4.
 - **Perbandingan jujur array vs linked list:**
 
@@ -152,17 +275,30 @@ public:
 
 > Praktik industri: `std::stack` (default berbasis `deque`) memakai strategi array yang tumbuh otomatis — gabungan kelebihan keduanya.
 
-## 5. Studi Kasus 1: Infix → Postfix
+## 5. Studi Kasus 1: Infix ↔ Postfix ↔ Prefix (bolak-balik)
 
-**Latar:** manusia menulis `A+B*C` (infix, butuh kurung & precedence), komputer lebih mudah mengevaluasi `ABC*+` (postfix, cukup scan kiri→kanan dengan stack). Konversi ini aplikasi klasik stack.
+**Latar (kalimat pendek):** manusia biasa tulis `A+B` (tanda di tengah). Komputer lebih gampang hitung kalau tanda di belakang `AB+` atau di depan `+AB`. Tugas kita: ubah bolak-balik pakai tumpukan.
 
-**Aturan:** operand langsung ke output; `(` didorong; `)` memuntahkan sampai `(`; operator memuntahkan operator ≥ precedence-nya dulu, baru dirinya didorong.
+> **Kata sulit = arti mudah:**
+> - *infix (tengah)* = tanda di tengah: `A+B`. Cara manusia.
+> - *postfix (belakang)* = tanda di belakang: `AB+`. Cara komputer.
+> - *prefix (depan)* = tanda di depan: `+AB`. Cara komputer lain.
+> - *precedence (urutan kuat)* = kali/bagi lebih kuat dari tambah/kurang. Jadi `A+B*C` artinya `A+(B*C)`, bukan `(A+B)*C`.
+> - *associative (arah kumpul)* = kalau kuatnya sama, kumpul dari mana dulu. `A+B+C` kumpul dari kiri `(A+B)+C`. `A^B^C` kumpul dari kanan `A^(B^C)`.
+
+**Aturan cepat (ingat 3 baris ini):**
+1. Huruf/angka langsung ke hasil. Tidak mampir ke stack.
+2. `(` didorong. `)` keluarkan semua sampai ketemu `(`.
+3. Operator baru keluarkan operator lama yang lebih kuat (atau sama kuat, lihat aturan pangkat `^`).
 
 ```cpp
 #include <iostream>
 #include <stack>
 #include <cctype>
+#include <string>
+#include <algorithm>
 using namespace std;
+// Simpan SEMUA kode ke file konversi.cpp
 
 int prec(char c) {
     if (c == '^') return 3;
@@ -170,50 +306,179 @@ int prec(char c) {
     if (c == '+' || c == '-') return 1;
     return -1;
 }
+bool isOperator(char c) {
+    return c=='+'||c=='-'||c=='*'||c=='/'||c=='^';
+}
 
+// 1. Infix -> Postfix (tengah -> belakang)
+// Contoh: A+B*C jadi ABC*+
 string infixToPostfix(string s) {
     stack<char> st; string out;
     for (char c : s) {
+        if (c == ' ') continue;
         if (isalnum(c)) out += c;
         else if (c == '(') st.push(c);
         else if (c == ')') {
             while (!st.empty() && st.top() != '(') { out += st.top(); st.pop(); }
-            st.pop();
-        } else {
-            while (!st.empty() && prec(st.top()) >= prec(c)) { out += st.top(); st.pop(); }
+            if (!st.empty()) st.pop(); // buang '('
+        } else if (isOperator(c)) {
+            // keluarkan yang lebih kuat, atau sama kuat KECUALI '^'
+            // karena '^' kumpul dari kanan, jadi jangan keluarkan sesama '^'
+            while (!st.empty() && st.top() != '(' &&
+                   (prec(st.top()) > prec(c) ||
+                    (prec(st.top()) == prec(c) && c != '^'))) {
+                out += st.top(); st.pop();
+            }
             st.push(c);
         }
     }
-    while (!st.empty()) { out += st.top(); st.pop(); }
+    while (!st.empty()) { if (st.top() != '(') out += st.top(); st.pop(); }
     return out;
 }
 
+// 2. Infix -> Prefix (tengah -> depan)
+// Contoh: A+B*C jadi +A*BC
+// Cara: balik tulisan, tukar ( dengan ), jadi postfix, lalu balik lagi.
+string infixToPrefix(string s) {
+    string rev = "";
+    for (int i = s.size()-1; i >= 0; i--) {
+        if (s[i] == '(') rev += ')';
+        else if (s[i] == ')') rev += '(';
+        else rev += s[i];
+    }
+    stack<char> st; string out;
+    for (char c : rev) {
+        if (c == ' ') continue;
+        if (isalnum(c)) out += c;
+        else if (c == '(') st.push(c);
+        else if (c == ')') {
+            while (!st.empty() && st.top() != '(') { out += st.top(); st.pop(); }
+            if (!st.empty()) st.pop();
+        } else if (isOperator(c)) {
+            // KEBALIKAN dari postfix: untuk prefix, yang sama kuat
+            // hanya dikeluarkan kalau c == '^'. Ini karena tulisan dibalik.
+            while (!st.empty() && st.top() != '(' &&
+                   (prec(st.top()) > prec(c) ||
+                    (prec(st.top()) == prec(c) && c == '^'))) {
+                out += st.top(); st.pop();
+            }
+            st.push(c);
+        }
+    }
+    while (!st.empty()) { if (st.top() != '(') out += st.top(); st.pop(); }
+    reverse(out.begin(), out.end());
+    return out;
+}
+
+// 3. Postfix -> Infix (belakang -> tengah)
+// Contoh: ABC*+ jadi (A+(B*C))
+// Cara: ketemu huruf -> dorong. Ketemu tanda -> ambil 2, bungkus kurung.
+string postfixToInfix(string s) {
+    stack<string> st;
+    for (char c : s) {
+        if (c == ' ') continue;
+        if (isalnum(c)) st.push(string(1, c));
+        else if (isOperator(c)) {
+            if (st.size() < 2) return "ERROR";
+            string b = st.top(); st.pop(); // kanan dulu
+            string a = st.top(); st.pop(); // kiri
+            st.push("(" + a + c + b + ")");
+        }
+    }
+    return st.empty() ? "" : st.top();
+}
+
+// 4. Prefix -> Infix (depan -> tengah)
+// Contoh: +A*BC jadi (A+(B*C))
+// Cara: jalan dari BELAKANG. Sama seperti postfix tapi dari kanan.
+string prefixToInfix(string s) {
+    stack<string> st;
+    for (int i = s.size()-1; i >= 0; i--) {
+        char c = s[i];
+        if (c == ' ') continue;
+        if (isalnum(c)) st.push(string(1, c));
+        else if (isOperator(c)) {
+            if (st.size() < 2) return "ERROR";
+            string a = st.top(); st.pop(); // kiri (karena dari belakang)
+            string b = st.top(); st.pop(); // kanan
+            st.push("(" + a + c + b + ")");
+        }
+    }
+    return st.empty() ? "" : st.top();
+}
+
 int main() {
-    cout << infixToPostfix("A+B*C") << endl;   // ABC*+
-    cout << infixToPostfix("(A+B)*C") << endl; // AB+C*
+    cout << "== Tengah -> Belakang & Depan ==" << endl;
+    cout << "A+B*C   -> postfix " << infixToPostfix("A+B*C") << " (harusnya ABC*+)" << endl;
+    cout << "A+B*C   -> prefix  " << infixToPrefix("A+B*C") << " (harusnya +A*BC)" << endl;
+    cout << "(A+B)*C -> postfix " << infixToPostfix("(A+B)*C") << " (harusnya AB+C*)" << endl;
+    cout << "(A+B)*C -> prefix  " << infixToPrefix("(A+B)*C") << " (harusnya *+ABC)" << endl;
+    cout << "A^B^C   -> postfix " << infixToPostfix("A^B^C") << " (harusnya ABC^^)" << endl;
+    cout << "A^B^C   -> prefix  " << infixToPrefix("A^B^C") << " (harusnya ^A^BC)" << endl;
+
+    cout << "\n== Belakang/Depan -> Tengah (kebalikannya) ==" << endl;
+    cout << "ABC*+  -> infix " << postfixToInfix("ABC*+") << endl;
+    cout << "+A*BC  -> infix " << prefixToInfix("+A*BC") << endl;
+    cout << "ABC^^  -> infix " << postfixToInfix("ABC^^") << endl;
+    cout << "^A^BC  -> infix " << prefixToInfix("^A^BC") << endl;
+
+    cout << "\n== Cek bolak-balik (harus kembali) ==" << endl;
+    string awal = "(A+B)*C";
+    string post = infixToPostfix(awal);
+    cout << awal << " -> " << post << " -> " << postfixToInfix(post) << endl;
+    string pre = infixToPrefix(awal);
+    cout << awal << " -> " << pre << " -> " << prefixToInfix(pre) << endl;
     return 0;
 }
 ```
 
-**Penjelasan per cabang + trace `A+B*C` → `ABC*+`:**
+**Cara menjalankan:** simpan ke `konversi.cpp`, lalu:
 
-- `prec(c)` — tabel precedence: `^`=3 (paling kuat), `*`/`/`=2, `+`/`-`=1, selainnya −1 (termasuk `(` sehingga tidak pernah ikut tertandingi dan aman tertinggal di stack).
-- `if (isalnum(c)) out += c` — operand (huruf/angka) **tidak pernah menyentuh stack**, langsung ke output. Ini alasan postfix tidak butuh kurung: urutan operand sudah final.
-- `c == '('` → push mentah. Fungsinya sebagai **pembatas**: operator di dalamnya tidak boleh keluar sebelum `)` tiba.
-- `c == ')'` → muntahkan (`out += top; pop`) sampai menemukan `(`, lalu `st.pop()` **membuang** `(` tanpa ke output. Jika tidak ada `(` (kurung tak seimbang) → `st.pop()` pada stack kosong = undefined; versi produksi perlu guard.
-- **Cabang operator:** `while (top ≥ c) muntahkan` menjamin operator lemah/kuat-yang-datang-duluan keluar dulu. Contoh `A+B*C`: `+` sudah di stack saat `*` tiba; karena prec(`+`)=1 < prec(`*`)=2, while tidak jalan → `*` didorong di atas `+`. Di akhir, pemuntahan menghasilkan `*` dulu baru `+` → `ABC*+` (perkalian dievaluasi dulu — benar!).
-- **Trace tabel `A+B*C`:**
+```bash
+g++ -std=c++17 konversi.cpp -o konversi
+./konversi
+# di Windows: .\konversi.exe
+```
 
-| c | Aksi | out | stack |
+**Output:**
+
+```text
+== Tengah -> Belakang & Depan ==
+A+B*C   -> postfix ABC*+ (harusnya ABC*+)
+A+B*C   -> prefix +A*BC (harusnya +A*BC)
+(A+B)*C -> postfix AB+C* (harusnya AB+C*)
+(A+B)*C -> prefix *+ABC (harusnya *+ABC)
+A^B^C   -> postfix ABC^^ (harusnya ABC^^)
+A^B^C   -> prefix ^A^BC (harusnya ^A^BC)
+== Belakang/Depan -> Tengah (kebalikannya) ==
+ABC*+  -> infix (A+(B*C))
++A*BC  -> infix (A+(B*C))
+ABC^^  -> infix (A^(B^C))
+^A^BC  -> infix (A^(B^C))
+== Cek bolak-balik (harus kembali) ==
+(A+B)*C -> AB+C* -> ((A+B)*C)
+(A+B)*C -> *+ABC -> ((A+B)*C)
+```
+
+**Penjelasan tiap fungsi (kalimat pendek):**
+
+- `infixToPostfix`: huruf langsung ke hasil. `(` didorong sebagai pembatas. `)` keluarkan sampai `(`. Operator baru keluarkan yang lama kalau lama lebih kuat, atau sama kuat tapi bukan `^`. Contoh `A+B*C`: saat `*` datang, `+` di stack lebih lemah jadi tidak keluar → `*` numpang di atas `+`. Di akhir keluar `*` dulu baru `+` → `ABC*+`. Benar karena kali dikerjakan dulu.
+- `infixToPrefix`: sama tapi lewat 3 langkah: 1) balik tulisan `A+B*C` jadi `C*B+A` + tukar kurung, 2) jadi postfix dengan aturan dibalik (sama kuat dikeluarkan hanya kalau `^`), 3) balik hasil. Harus dibalik karena prefix baca dari depan.
+- `postfixToInfix`: jalan dari kiri. Huruf didorong sebagai kata. Tanda ambil 2 kata teratas (`b` kanan dulu, `a` kiri), bungkus jadi `(a tanda b)`, dorong lagi. Contoh `ABC*+`: `A` dorong, `B` dorong, `C` dorong, `*` ambil `B,C` jadi `(B*C)` dorong, `+` ambil `A,(B*C)` jadi `(A+(B*C))`.
+- `prefixToInfix`: sama tapi jalan dari kanan (belakang). Karena tanda di depan, harus baca mundur baru ketemu huruf dulu. Ambil `a` dulu baru `b`, bungkus `(a tanda b)`.
+- **Trace tabel `A+B*C` → `ABC*+`:**
+
+| huruf | apa | hasil | tumpukan |
 |---|---|---|---|
-| A | operand | A | [] |
-| + | stack kosong → push | A | [+] |
-| B | operand | AB | [+] |
-| * | top(+) < * → push | AB | [+, *] |
-| C | operand | ABC | [+, *] |
-| akhir | muntahkan semua | ABC*+ | [] |
+| A | huruf | A | [] |
+| + | dorong | A | [+] |
+| B | huruf | AB | [+] |
+| * | `+` lebih lemah → dorong | AB | [+, *] |
+| C | huruf | ABC | [+, *] |
+| habis | keluarkan semua | ABC*+ | [] |
 
-- **Trace `(A+B)*C`:** `(` push; A→out; `+` push (di atas `(`); B→out; `)` muntahkan `+` lalu buang `(`; `*` push; C→out; akhir muntahkan `*` → `AB+C*`. Terlihat kurung memaksa penjumlahan duluan.
+- **Trace `(A+B)*C` → `AB+C*`:** `(` dorong; A ke hasil; `+` dorong di atas `(`; B ke hasil; `)` keluarkan `+` lalu buang `(`; `*` dorong; C ke hasil; habis keluarkan `*` → `AB+C*`. Kurung bikin tambah dikerjakan dulu.
+- **Contoh pangkat `A^B^C`:** `^` kumpul dari kanan. Jadi `A^B^C` = `A^(B^C)` → postfix `ABC^^` (bukan `AB^C^`), prefix `^A^BC`. Kalau salah aturan `>=`, hasilnya jadi kiri dan salah. Ini yang diuji di Tugas E2.
 
 ### Studi Kasus 2: Undo/Redo Text Editor
 
@@ -244,7 +509,19 @@ int main() {
 }
 ```
 
-**Penjelasan alur + isi stack:**
+**Cara menjalankan:** simpan ke `undo.cpp`, lalu `g++ -std=c++17 undo.cpp -o undo` lalu `./undo`.
+
+**Output:**
+
+```text
+Halo Dunia
+Undo: Halo
+Redo: Halo Dunia
+```
+
+> **Kata sulit = arti mudah:** *undo* = batalkan ketikan terakhir (Ctrl+Z). *redo* = kembalikan yang dibatalkan (Ctrl+Y). *snapshot* = foto isi teks tiap selesai ketik.
+
+**Penjelasan alur + isi stack (kalimat pendek):**
 
 1. **Setup:** `undo = [""]` (snapshot kosong wajib ada sebagai dasar; tanpanya undo terakhir akan mengosongkan stack dan `top()` crash). `redo = []`.
 2. **Mengetik:** setiap selesai aksi (bukan per huruf, demi hemat memori), push snapshot baru. Setelah dua aksi: `undo = ["", "Halo", "Halo Dunia"]`, teks = "Halo Dunia".
@@ -252,6 +529,191 @@ int main() {
 4. **REDO** = kebalikan: pindahkan top `redo` kembali ke `undo`: `undo = ["", "Halo", "Halo Dunia"]`, teks = "Halo Dunia".
 5. **Aturan yang disederhanakan di sini:** mengetik baru setelah undo seharusnya **mengosongkan redo** (cabang redo hangus — perilaku VS Code/Word). Versi lengkap: tiap aksi ketik baru → `while (!redo.empty()) redo.pop();`.
 6. **Biaya:** menyimpan seluruh string tiap aksi = O(n) memori per aksi. Editor nyata menyimpan **delta** (operasi insert/delete + posisi), bukan snapshot penuh — optimasi yang bagus untuk Tugas.
+
+### Studi Kasus 3: Kalkulator Prefix & Postfix
+
+**Ide (kalimat pendek):** kalkulator biasa baca `2 + 3`. Kalkulator postfix baca `2 3 +`. Kalkulator prefix baca `+ 2 3`. Tidak ada kurung. Cara hitung cuma pakai satu tumpukan angka.
+
+> **Kata sulit = arti mudah:**
+> - *postfix (belakang)* = tanda di belakang: `2 3 +`. Baca dari kiri.
+> - *prefix (depan)* = tanda di depan: `+ 2 3`. Baca dari kanan (belakang).
+> - *operand (angka)* = angka yang didorong ke tumpukan.
+> - *operator (tanda)* = `+ - * / ^`. Kalau ketemu tanda, ambil 2 angka teratas lalu hitung.
+> - *evaluasi (hitung)* = kerja menghitung sampai dapat hasil.
+
+**Aturan hitung (ingat 2 baris ini):**
+1. Postfix: jalan dari kiri. Angka → dorong. Tanda → ambil 2 (`b` atas, `a` bawahnya), hitung `a tanda b`, dorong hasil.
+2. Prefix: sama, tapi jalan dari kanan (belakang). Angka → dorong. Tanda → ambil 2 (`a` atas, `b` bawahnya), hitung `a tanda b`, dorong hasil.
+
+```cpp
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <cctype>
+#include <cmath>
+using namespace std;
+// Simpan SEMUA kode ke file kalkulator.cpp
+// Catatan: tumpukan di sini pakai vector biar gampang dicetak.
+// push = push_back, pop = pop_back, top = back.
+
+bool isOperator(char c) {
+    return c=='+'||c=='-'||c=='*'||c=='/'||c=='^';
+}
+double terapkan(double a, double b, char op, bool &ok) {
+    ok = true;
+    if (op == '+') return a + b;
+    if (op == '-') return a - b;
+    if (op == '*') return a * b;
+    if (op == '/') {
+        if (b == 0) { cout << "ERROR: bagi nol!\n"; ok = false; return 0; }
+        return a / b;
+    }
+    if (op == '^') return pow(a, b);
+    ok = false; return 0;
+}
+// Pecah tulisan per spasi. Contoh "2 3 * 5 +" jadi ["2","3","*","5","+"]
+// Kalau tidak ada spasi (mis "23*5+"), pecah per huruf.
+vector<string> pecah(string s) {
+    vector<string> hasil;
+    if (s.find(' ') != string::npos) {
+        stringstream ss(s); string w;
+        while (ss >> w) hasil.push_back(w);
+    } else {
+        for (char c : s) {
+            if (c == ' ') continue;
+            hasil.push_back(string(1, c));
+        }
+    }
+    return hasil;
+}
+void cetakTumpukan(vector<double> st) {
+    cout << "[";
+    for (int i = 0; i < st.size(); i++) {
+        cout << st[i];
+        if (i+1 < st.size()) cout << ", ";
+    }
+    cout << "]";
+}
+// Hitung postfix. Contoh "2 3 * 5 +" = 11
+double evalPostfix(string s, bool jejak = false) {
+    vector<string> tok = pecah(s);
+    vector<double> st;
+    for (string t : tok) {
+        if (t.size() == 1 && isOperator(t[0])) {
+            if (st.size() < 2) { cout << "ERROR: angka kurang!\n"; return 0; }
+            double b = st.back(); st.pop_back();
+            double a = st.back(); st.pop_back();
+            bool ok; double h = terapkan(a, b, t[0], ok);
+            if (!ok) return 0;
+            st.push_back(h);
+            if (jejak) { cout << "  baca '" << t << "': hitung " << a << t << b << "=" << h << " -> "; cetakTumpukan(st); cout << endl; }
+        } else {
+            st.push_back(stod(t));
+            if (jejak) { cout << "  baca '" << t << "': dorong angka -> "; cetakTumpukan(st); cout << endl; }
+        }
+    }
+    if (st.size() != 1) { cout << "ERROR: tulisan salah!\n"; return 0; }
+    return st.back();
+}
+// Hitung prefix. Contoh "+ * 2 3 5" = 11. Jalan dari BELAKANG.
+double evalPrefix(string s, bool jejak = false) {
+    vector<string> tok = pecah(s);
+    vector<double> st;
+    for (int i = tok.size()-1; i >= 0; i--) {
+        string t = tok[i];
+        if (t.size() == 1 && isOperator(t[0])) {
+            if (st.size() < 2) { cout << "ERROR: angka kurang!\n"; return 0; }
+            double a = st.back(); st.pop_back();
+            double b = st.back(); st.pop_back();
+            bool ok; double h = terapkan(a, b, t[0], ok);
+            if (!ok) return 0;
+            st.push_back(h);
+            if (jejak) { cout << "  baca '" << t << "': hitung " << a << t << b << "=" << h << " -> "; cetakTumpukan(st); cout << endl; }
+        } else {
+            st.push_back(stod(t));
+            if (jejak) { cout << "  baca '" << t << "': dorong angka -> "; cetakTumpukan(st); cout << endl; }
+        }
+    }
+    if (st.size() != 1) { cout << "ERROR: tulisan salah!\n"; return 0; }
+    return st.back();
+}
+
+int main() {
+    cout << "== 1. Kalkulator postfix (baca kiri) ==" << endl;
+    cout << "Jejak '2 3 * 5 +':" << endl;
+    double h1 = evalPostfix("2 3 * 5 +", true);
+    cout << "Hasil = " << h1 << " (harusnya 11 karena (2*3)+5)" << endl;
+
+    cout << "\n== 2. Kalkulator prefix (baca kanan) ==" << endl;
+    cout << "Jejak '+ * 2 3 5':" << endl;
+    double h2 = evalPrefix("+ * 2 3 5", true);
+    cout << "Hasil = " << h2 << " (harusnya 11 juga)" << endl;
+
+    cout << "\n== 3. Contoh lain ==" << endl;
+    cout << "'5 1 2 + 4 * + 3 -' = " << evalPostfix("5 1 2 + 4 * + 3 -") << " (harusnya 14)" << endl;
+    // prefix dari atas: 5 + ((1+2)*4) - 3  ->  - + 5 * + 1 2 4 3
+    cout << "'- + 5 * + 1 2 4 3' = " << evalPrefix("- + 5 * + 1 2 4 3") << " (harusnya 14 juga)" << endl;
+    cout << "'* + 2 3 4' = " << evalPrefix("* + 2 3 4") << " (harusnya 20 karena (2+3)*4)" << endl;
+
+    cout << "\n== 4. Tanpa spasi (versi tugas) ==" << endl;
+    cout << "'23*5+' = " << evalPostfix("23*5+") << " (harusnya 11)" << endl;
+    cout << "'+*235' = " << evalPrefix("+*235") << " (harusnya 11)" << endl;
+
+    cout << "\n== 5. Contoh salah ==" << endl;
+    cout << "'4 0 /' = "; evalPostfix("4 0 /");
+    cout << "'2 +' = "; evalPostfix("2 +");
+    return 0;
+}
+```
+
+**Cara menjalankan:** simpan ke `kalkulator.cpp`, lalu:
+
+```bash
+g++ -std=c++17 kalkulator.cpp -o kalkulator
+./kalkulator
+# di Windows: .\kalkulator.exe
+```
+
+**Output:**
+
+```text
+== 1. Kalkulator postfix (baca kiri) ==
+Jejak '2 3 * 5 +':
+  baca '2': dorong angka -> [2]
+  baca '3': dorong angka -> [2, 3]
+  baca '*': hitung 2*3=6 -> [6]
+  baca '5': dorong angka -> [6, 5]
+  baca '+': hitung 6+5=11 -> [11]
+Hasil = 11 (harusnya 11 karena (2*3)+5)
+== 2. Kalkulator prefix (baca kanan) ==
+Jejak '+ * 2 3 5':
+  baca '5': dorong angka -> [5]
+  baca '3': dorong angka -> [5, 3]
+  baca '2': dorong angka -> [5, 3, 2]
+  baca '*': hitung 2*3=6 -> [5, 6]
+  baca '+': hitung 6+5=11 -> [11]
+Hasil = 11 (harusnya 11 juga)
+== 3. Contoh lain ==
+'5 1 2 + 4 * + 3 -' = 14 (harusnya 14)
+'- + 5 * + 1 2 4 3' = 14 (harusnya 14 juga)
+'* + 2 3 4' = 20 (harusnya 20 karena (2+3)*4)
+== 4. Tanpa spasi (versi tugas) ==
+'23*5+' = 11 (harusnya 11)
+'+*235' = 11 (harusnya 11)
+== 5. Contoh salah ==
+'4 0 /' = ERROR: bagi nol!
+'2 +' = ERROR: angka kurang!
+```
+
+**Penjelasan (kalimat pendek):**
+
+1. **Kenapa postfix gampang?** Tidak butuh kurung. Angka numpang di tumpukan. Tanda selalu pakai 2 angka teratas. Urutan ambil penting untuk kurang/bagi: `b` = paling atas (kanan), `a` = bawahnya (kiri), hitung `a tanda b`. Contoh `5-3`: dorong 5, dorong 3, ketemu `-` ambil b=3, a=5, hitung 5-3=2. Kalau dibalik jadi -2, salah.
+2. **Kenapa prefix jalan dari belakang?** Karena tanda di depan. Kalau jalan dari kiri akan ketemu tanda dulu padahal angka belum ada. Jadi balik: baca dari kanan, jadinya sama seperti postfix. Contoh `+ * 2 3 5` dibaca mundur jadi `5 3 2 * +`, lalu hitung seperti biasa.
+3. **Fungsi `pecah`:** kalau ada spasi, potong per kata biar `12` tetap dua belas (bukan 1 dan 2). Kalau tidak ada spasi (versi tugas `23*5+`), potong per huruf biar cocok dengan tugas lama.
+4. **Fungsi `terapkan`:** satu tempat untuk `+ - * / ^`. Bagi nol dicek dulu biar tidak crash. Pangkat pakai `pow` dari `<cmath>`.
+5. **Hubungan dengan Studi Kasus 1:** kalkulator infix = ubah dulu ke postfix (`infixToPostfix`), lalu `evalPostfix`. Contoh `(2+3)*4` → postfix `2 3 + 4 *` → hasil 20. Jadi 3 studi kasus saling sambung: ubah (SK1) → hitung (SK3) → batal/ulang (SK2).
+
+> **Coba sendiri:** ganti `main` dengan angka buatanmu. Aturan: postfix tulis angka-spasi-tanda, mis `10 2 8 * + 3 -`. Prefix tulis terbalik, mis `- + 10 * 2 8 3`. Hitung tangan dulu, lalu cek dengan program.
 
 ## 6. Tugas Praktikum 🧩
 
@@ -280,11 +742,12 @@ int main() {
 3. Analisis kompleksitas waktu & ruang di laporan (target: O(n) waktu, O(n) ruang) + jelaskan mengapa stack wajib di sini (tidak bisa diganti counter biasa).
 *Kriteria nilai:* kebenaran 5 kasus (50%), penanganan stack kosong (20%), analisis O (30%).
 
-**Tugas M2: Evaluasi Postfix Lengkap.**
-1. Lengkapi fungsi `int evalPostfix(string s)` untuk ekspresi satu digit (contoh `23*5+` = 11, `82/3-` = 1). Aturan: digit → push; operator `+-*/` → pop dua operan (`b = pop, a = pop`), push `a op b`.
-2. Tangani: pembagian nol (cetak error, return 0), ekspresi invalid (stack akhir ≠ 1 elemen).
-3. Uji minimal 4 ekspresi + tunjukkan trace stack untuk satu ekspresi di laporan.
-*Kriteria nilai:* kebenaran hitung (50%), penanganan error (25%), trace di laporan (25%).
+**Tugas M2: Evaluasi Postfix + Coba Prefix.**
+1. Lengkapi fungsi `int evalPostfix(string s)` untuk ekspresi satu digit (contoh `23*5+` = 11, `82/3-` = 1). Aturan: digit → dorong; operator `+-*/` → ambil dua (`b = pop, a = pop`), dorong `a op b`.
+2. Tangani: pembagian nol (cetak error, return 0), ekspresi salah (isi akhir stack ≠ 1).
+3. Uji minimal 4 ekspresi + tunjukkan isi stack untuk satu ekspresi di laporan.
+4. Bonus: salin kode `konversi.cpp`, uji `infixToPrefix` dan `prefixToInfix` untuk `A+B*C` dan `(A+B)*C`. Tulis 2 kalimat: apa beda cara kerja prefix vs postfix?
+*Kriteria nilai:* hitung benar (50%), atasi error (25%), jejak + bonus prefix (25%).
 
 ### 🔴 Level Expert — *Menggabungkan & Menganalisis*
 
@@ -294,8 +757,8 @@ int main() {
 3. Di laporan: buktikan mengapa skema ini hemat memori dibanding dua array terpisah + analisis kompleksitas tiap operasi.
 *Kriteria nilai:* kebenaran logika dua arah (50%), demo interleaved (20%), analisis memori (30%).
 
-**Tugas E2: Infix → Postfix dengan `^` Right-Associative + Undo/Redo Sempurna.**
-1. Perluas `infixToPostfix` modul: pangkat `^` bersifat *right-associative* (aturan pop: `prec(top) > prec(c)` untuk `^`, `>=` untuk lainnya). Uji: `A^B^C` → `ABC^^` (bukan `AB^C^`), `A+B*C` tetap `ABC*+`.
+**Tugas E2: Uji `^` + Prefix Bolak-balik + Undo/Redo Sempurna.**
+1. Kode `konversi.cpp` sudah benar untuk pangkat `^` yang kumpul dari kanan (*right-associative* = kumpul dari kanan, arti mudahnya: `A^B^C` = `A^(B^C)`). Buktikan: uji `A^B^C` → `ABC^^` dan `^A^BC` (bukan `AB^C^`), `A+B*C` tetap `ABC*+` dan `+A*BC`. Jelaskan 3 kalimat: kenapa aturan `^` dibalik antara postfix dan prefix. Coba hapus aturan khusus `^` lalu tunjukkan hasilnya jadi salah.
 2. Perluas studi kasus Undo/Redo: tiap aksi ketik baru **wajib mengosongkan `redo`** (`while (!redo.empty()) redo.pop();`). Simulasikan skenario: ketik A, ketik B, undo, ketik C (maka redo hangus → redo setelah ini harus gagal).
 3. Tulis refleksi filosofis 1 paragraf: hubungkan perilaku "redo hangus" dengan keputusan hidup yang tidak bisa diulang setelah cabang baru diambil.
 *Kriteria nilai:* associativity benar (30%), redo-clear benar (30%), skenario uji + refleksi (40%).

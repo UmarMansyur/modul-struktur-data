@@ -2,6 +2,8 @@
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 0–3
 
+> **Cara menjalankan:** SEMUA kode di modul ini sekarang sudah lengkap dengan `main`. Copy utuh ke file `.cpp`, lalu `g++ -std=c++17 nama.cpp -o nama` lalu `./nama`. Mulai dari `linkedlist.cpp` dulu karena itu yang paling dasar.
+
 ## 1. Capaian Pembelajaran
 
 1. Menjelaskan konsep dynamic memory (`new`/`delete`), Node, Head, Tail.
@@ -123,9 +125,66 @@ public:
     Node* getHead() { return head; }
     ~LinkedList() { while (head) deleteFirst(); } // cegah memory leak
 };
+
+// Contoh pakai yang bisa langsung jalan.
+// Simpan SEMUA kode ke file linkedlist.cpp
+int main() {
+    LinkedList list;
+    cout << "Awal: "; list.display();
+
+    list.insertFirst(20);
+    list.insertFirst(10);
+    cout << "Setelah tambah depan 20 lalu 10: "; list.display();
+
+    list.insertLast(30);
+    cout << "Setelah tambah belakang 30: "; list.display();
+
+    Node* ketemu = nullptr;
+    // cari manual pakai getHead (contoh search sederhana)
+    for (Node* t = list.getHead(); t; t = t->next)
+        if (t->data == 20) { ketemu = t; break; }
+    if (ketemu) {
+        list.insertAfter(ketemu, 25);
+        cout << "Setelah selip 25 sesudah 20: "; list.display();
+    }
+
+    list.deleteFirst();
+    cout << "Setelah hapus depan: "; list.display();
+
+    list.deleteLast();
+    cout << "Setelah hapus belakang: "; list.display();
+    return 0;
+}
 ```
 
-**Penjelasan per bagian:**
+**Cara menjalankan:**
+
+```bash
+g++ -std=c++17 linkedlist.cpp -o linkedlist
+./linkedlist
+# di Windows: .\linkedlist.exe
+```
+
+**Output:**
+
+```text
+Awal: NULL
+Setelah tambah depan 20 lalu 10: 10 -> 20 -> NULL
+Setelah tambah belakang 30: 10 -> 20 -> 30 -> NULL
+Setelah selip 25 sesudah 20: 10 -> 20 -> 25 -> 30 -> NULL
+Setelah hapus depan: 20 -> 25 -> 30 -> NULL
+Setelah hapus belakang: 20 -> 25 -> NULL
+```
+
+> **Kata sulit = arti mudah:**
+> - *Linked List (senarai berantai)* = gerbong kereta. Tiap gerbong ada barang + sambungan ke gerbong berikut.
+> - *Node* = satu gerbong. *Head* = gerbong paling depan (kepala). *Tail* = gerbong paling belakang (ekor).
+> - *insertFirst / insertLast* = tambah gerbong di depan / belakang. *insertAfter* = selip gerbong sesudah gerbong tertentu.
+> - *deleteFirst / deleteLast* = lepas gerbong depan / belakang.
+> - *Traversal (jalan-jalan)* = lihat semua gerbong satu per satu dari depan sampai habis.
+> - *new / delete* = bikin gerbong baru / bongkar gerbong. Tiap `new` harus ada `delete` biar tidak bocor.
+
+**Penjelasan per bagian (kalimat pendek):**
 
 - **`struct Node { int data; Node* next; }`** — satu simpul = 1 data + 1 pointer ke simpul berikut. `new Node{x, head}` memakai **aggregate initialization**: field pertama = x, kedua = head. Node hidup di **heap** (awet setelah fungsi selesai), tidak seperti variabel lokal stack.
 - **Konstruktor `LinkedList() : head(nullptr)`** — list kosong ditandai `head == nullptr`. Semua operasi mengandalkan konvensi ini, jadi inisialisasi benar adalah separuh kebenaran program.
@@ -137,28 +196,86 @@ public:
 - **`display`:** pointer jalan `t` dari head sampai `nullptr`, mencetak tiap data. Kondisi `t` ekuivalen `t != nullptr`. Kompleksitas O(n).
 - **Destructor `~LinkedList`:** dipanggil otomatis saat objek keluar scope; menghapus semua node satu per satu. Tanpanya, setiap `new` tanpa `delete` menumpuk → **memory leak**. Inilah RAII paling sederhana di C++.
 
-### Double Linked List (cuplikan)
+### Double Linked List (contoh utuh bisa jalan)
 
-**Ide:** tiap node punya dua pointer sehingga bisa jalan mundur. Operasi insert/delete perlu memperbaiki **dua arah**.
+**Ide sederhana:** gerbong punya sambungan depan-belakang. Jadi bisa jalan maju dan mundur. Simpan ke `dlist.cpp` lalu jalan.
 
 ```cpp
+#include <iostream>
+using namespace std;
 struct DNode { int data; DNode *prev, *next; };
-// insertFirst: baru->next = head; baru->prev = nullptr;
-//              if (head) head->prev = baru; head = baru;
+
+class DList {
+    DNode *head, *tail;
+public:
+    DList(): head(nullptr), tail(nullptr) {}
+    void tambahBelakang(int x) {
+        DNode* b = new DNode{x, tail, nullptr};
+        if (!head) head = tail = b;
+        else { tail->next = b; tail = b; }
+    }
+    void cetakMaju() {
+        cout << "maju: ";
+        for (DNode* t = head; t; t = t->next) cout << t->data << " ";
+        cout << endl;
+    }
+    void cetakMundur() {
+        cout << "mundur: ";
+        for (DNode* t = tail; t; t = t->prev) cout << t->data << " ";
+        cout << endl;
+    }
+};
+
+// Contoh pakai. Simpan SEMUA kode ke dlist.cpp
+int main() {
+    DList d;
+    d.tambahBelakang(10); d.tambahBelakang(20); d.tambahBelakang(30);
+    d.cetakMaju();   // 10 20 30
+    d.cetakMundur(); // 30 20 10
+    return 0;
+}
 ```
 
-**Penjelasan:** `baru->prev = nullptr` karena menjadi head (tidak ada pendahulu). Jika list tidak kosong, head lama harus menunjuk balik: `head->prev = baru` — baris yang paling sering dilupakan pemula, akibatnya traversal mundur berhenti di head lama. Kelebihan: `deleteLast` menjadi O(1) jika pointer `tail` disimpan (cukup `tail = tail->prev; delete tail->next;`). Harga: 8 byte ekstra per node (64-bit) + 2 assignment tambahan tiap operasi.
+**Cara menjalankan:** `g++ -std=c++17 dlist.cpp -o dlist` lalu `./dlist`. Output: `maju: 10 20 30` dan `mundur: 30 20 10`.
 
-### Circular Linked List (cuplikan)
+> **Kata sulit = arti mudah:** *prev* = sambungan ke gerbong belakang (sebelumnya). *next* = sambungan ke gerbong depan (sesudahnya).
 
-**Ide:** tidak ada ujung — `tail->next = head`. Cocok untuk antre round-robin dan permainan eliminasi (Tugas 3).
+**Penjelasan (kalimat pendek):** gerbong baru di belakang disambung ke `tail` lama. `prev` gerbong pertama = kosong. Kalau lupa isi `head->prev`, jalan mundur putus.
+
+### Circular Linked List (contoh utuh bisa jalan)
+
+**Ide sederhana:** kereta melingkar. Gerbong terakhir sambung lagi ke gerbong pertama. Cocok untuk main kursi musik. Simpan ke `clist.cpp`.
 
 ```cpp
-// tail->next = head (bukan nullptr)
-// traversal: do { ... } while (t != head);
+#include <iostream>
+using namespace std;
+struct CNode { int data; CNode* next; };
+
+int main() {
+    // buat lingkaran 1 -> 2 -> 3 -> balik ke 1
+    CNode* n1 = new CNode{1, nullptr};
+    CNode* n2 = new CNode{2, nullptr};
+    CNode* n3 = new CNode{3, nullptr};
+    n1->next = n2; n2->next = n3; n3->next = n1; // melingkar!
+    CNode* head = n1;
+    cout << "2 putaran: ";
+    CNode* t = head;
+    for (int i = 0; i < 6; i++) { cout << t->data << " "; t = t->next; }
+    cout << endl;
+    // traversal wajib do-while biar berhenti pas balik ke head:
+    cout << "1 putaran (do-while): ";
+    t = head;
+    if (head) {
+        do { cout << t->data << " "; t = t->next; } while (t != head);
+    }
+    cout << endl;
+    return 0;
+}
 ```
 
-**Penjelasan:** karena tidak ada `nullptr`, loop `while (t)` tidak akan pernah berhenti → traversal **wajib** `do-while` yang berhenti saat kembali ke head. Insert/delete mirip single, tapi ada 2 kasus khusus: list kosong (node baru menunjuk dirinya sendiri) dan operasi di tail (pointer tail harus diperbarui). Jebakan klasik: lupa memperbarui `tail->next` setelah `deleteFirst` pada list 1 elemen → dangling pointer melingkar.
+**Cara menjalankan:** `g++ -std=c++17 clist.cpp -o clist` lalu `./clist`. Output: `2 putaran: 1 2 3 1 2 3` dan `1 putaran (do-while): 1 2 3`.
+
+**Penjelasan (kalimat pendek):** karena tidak ada ujung, pakai `do-while` yang berhenti saat balik ke awal. Kalau pakai `while(t)` biasa, tidak pernah berhenti karena tidak ada yang kosong.
 
 ## 5. Studi Kasus: Antrean Pelanggan
 
@@ -211,6 +328,8 @@ int main() {
 3. **`tampil`:** traversal biasa O(n). `auto t` dideduksi compiler menjadi `Pelanggan*`.
 4. **Trace `main`:** datang ×3 → `1.Ahmad -> 2.Budi -> 3.Citra`; tampil mencetak ketiganya; layani menghapus Ahmad (head→Budi); tampil mencetak Budi, Citra. Semua operasi O(1) kecuali tampil.
 
+**Cara menjalankan:** simpan ke `antrean.cpp`, lalu `g++ -std=c++17 antrean.cpp -o antrean` lalu `./antrean`.
+
 **Contoh output:**
 ```
 Ahmad nomor antre 1
@@ -223,6 +342,8 @@ Melayani: Ahmad
 2. Budi
 3. Citra
 ```
+
+> **Bahasa mudah:** `datang` = tambah antre di belakang. `layani` = panggil antre paling depan. `tampil` = lihat semua yang masih antre. Simpan `head` (depan) + `tail` (belakang) biar tambah dan layani cepat tanpa jalan dari depan.
 
 ## 6. Tugas Praktikum 🧩
 

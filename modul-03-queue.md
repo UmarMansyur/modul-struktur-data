@@ -2,6 +2,8 @@
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 1 × 100 menit | **Prasyarat:** Modul 2
 
+> **Cara menjalankan:** SEMUA kode di modul ini sekarang sudah lengkap dengan `main`. Copy utuh ke file `.cpp`, lalu `g++ -std=c++17 nama.cpp -o nama` lalu `./nama`. Lihat output di bawah tiap kode untuk cek.
+
 ## 1. Capaian Pembelajaran
 
 1. Menjelaskan prinsip FIFO dan operasi Enqueue, Dequeue, Front, Rear.
@@ -78,6 +80,8 @@ Baik enqueue (di REAR) maupun dequeue (di FRONT), keduanya menyentuh langsung in
 **Tujuan kode:** memahami peran ganda FRONT/REAR dan konvensi kosong `FRONT == REAR == -1` sebelum naik ke versi circular yang lebih rumit.
 
 ```cpp
+#include <iostream>
+using namespace std;
 #define MAX 100
 class Queue {
     int data[MAX]; int FRONT, REAR;
@@ -97,10 +101,63 @@ public:
         return v;
     }
     int front() { return isEmpty() ? -1 : data[FRONT]; }
+    void cetak() {
+        if (isEmpty()) { cout << "[kosong]"; return; }
+        cout << "[depan] ";
+        for (int i = FRONT; i <= REAR; i++) cout << data[i] << " ";
+        cout << "[belakang] (FRONT=" << FRONT << " REAR=" << REAR << ")";
+    }
 };
+
+// Contoh pakai yang bisa langsung jalan.
+// Simpan SEMUA kode ke file queue_linear.cpp
+int main() {
+    Queue q;
+    q.enqueue(10); cout << "masuk 10: "; q.cetak(); cout << endl;
+    q.enqueue(20); cout << "masuk 20: "; q.cetak(); cout << endl;
+    q.enqueue(30); cout << "masuk 30: "; q.cetak(); cout << endl;
+    cout << "depan = " << q.front() << " (cuma ngintip)" << endl;
+    cout << "keluar = " << q.dequeue() << endl;
+    cout << "sesudah keluar: "; q.cetak(); cout << endl;
+    cout << "keluar = " << q.dequeue() << endl;
+    cout << "keluar = " << q.dequeue() << endl;
+    cout << "isi akhir: "; q.cetak(); cout << endl;
+    cout << "coba keluar saat kosong = " << q.dequeue() << endl;
+    return 0;
+}
 ```
 
-**Penjelasan detail:**
+**Cara menjalankan:**
+
+```bash
+g++ -std=c++17 queue_linear.cpp -o queue_linear
+./queue_linear
+# di Windows: .\queue_linear.exe
+```
+
+**Output:**
+
+```text
+masuk 10: [depan] 10 [belakang] (FRONT=0 REAR=0)
+masuk 20: [depan] 10 20 [belakang] (FRONT=0 REAR=1)
+masuk 30: [depan] 10 20 30 [belakang] (FRONT=0 REAR=2)
+depan = 10 (cuma ngintip)
+keluar = 10
+sesudah keluar: [depan] 20 30 [belakang] (FRONT=1 REAR=2)
+keluar = 20
+keluar = 30
+isi akhir: [kosong]
+Underflow
+coba keluar saat kosong = -1
+```
+
+> **Kata sulit = arti mudah:**
+> - *Queue (antrean)* = antre loket. Yang datang duluan, dilayani duluan.
+> - *FIFO (First In First Out)* = "yang pertama masuk, dia yang pertama keluar".
+> - *enqueue* = masuk antre (dari belakang). *dequeue* = keluar antre (dari depan). *front* = ngintip siapa paling depan.
+> - *FRONT* = penunjuk orang paling depan. *REAR* = penunjuk orang paling belakang.
+
+**Penjelasan detail (pakai kalimat pendek):**
 
 - **Konstruktor `FRONT = REAR = -1`:** menandai kosong. Alternatif populer: `front = 0, rear = -1, count = 0` (Tugas 3) yang tidak butuh reset — tapi konvensi -1/-1 di sini paling mudah untuk pemula.
 - **`enqueue`:**
@@ -121,6 +178,8 @@ public:
 **Tujuan kode:** memperbaiki linear queue — indeks **membungkus** dengan modulo sehingga sel depan yang kosong bisa dipakai lagi. Satu-satunya konsep baru adalah `(x+1) % SIZE`.
 
 ```cpp
+#include <iostream>
+using namespace std;
 #define SIZE 5
 class CircularQueue {
     int data[SIZE]; int FRONT, REAR;
@@ -140,10 +199,65 @@ public:
         else FRONT = (FRONT+1)%SIZE;
         return v;
     }
+    void cetak() {
+        if (isEmpty()) { cout << "[kosong]"; return; }
+        cout << "isi (dari depan): ";
+        int i = FRONT;
+        while (true) {
+            cout << data[i] << " ";
+            if (i == REAR) break;
+            i = (i+1)%SIZE;
+        }
+        cout << "(FRONT=" << FRONT << " REAR=" << REAR << ")";
+    }
 };
+
+// Contoh pakai yang bisa langsung jalan.
+// Simpan ke file queue_circular.cpp
+int main() {
+    CircularQueue q;
+    cout << "Isi 10,20,30,40:" << endl;
+    q.enqueue(10); q.enqueue(20); q.enqueue(30); q.enqueue(40);
+    q.cetak(); cout << endl;
+    cout << "keluar 2 orang: " << q.dequeue() << ", " << q.dequeue() << endl;
+    q.cetak(); cout << endl;
+    cout << "Masuk 50,60 (60 pakai tempat kosong depan):" << endl;
+    q.enqueue(50); q.enqueue(60);
+    q.cetak(); cout << endl;
+    cout << "Coba masuk 70 (harusnya Penuh!):" << endl;
+    q.enqueue(70);
+    q.cetak(); cout << endl;
+    return 0;
+}
 ```
 
-**Penjelasan detail:**
+**Cara menjalankan:**
+
+```bash
+g++ -std=c++17 queue_circular.cpp -o queue_circular
+./queue_circular
+```
+
+**Output:**
+
+```text
+Isi 10,20,30,40:
+isi (dari depan): 10 20 30 40 (FRONT=0 REAR=3)
+keluar 2 orang: 10, 20
+isi (dari depan): 30 40 (FRONT=2 REAR=3)
+Masuk 50,60 (60 pakai tempat kosong depan):
+isi (dari depan): 30 40 50 60 (FRONT=2 REAR=0)
+Coba masuk 70 (harusnya Penuh!):
+Penuh!
+isi (dari depan): 30 40 50 60 (FRONT=2 REAR=0)
+```
+
+> **Kata sulit = arti mudah:**
+> - *Circular (melingkar)* = kursi melingkar. Kalau sudah di ujung, balik lagi ke awal. Jadi tempat kosong depan bisa dipakai lagi.
+> - *Modulo (%)* = sisa bagi. Contoh `(4+1)%5 = 0` artinya "habis nomor 4, balik ke 0".
+> - *Memory wastage (tempat terbuang)* = ada kursi kosong tapi tidak bisa dipakai. Antrean biasa boros, antrean melingkar hemat.
+
+**Penjelasan detail (pakai kalimat pendek):**
 
 - **Modulo sebagai "belokan":** `(REAR+1) % SIZE` memetakan `4 → 0` (untuk SIZE 5). Jadi setelah REAR=4, enqueue berikut menempati sel 0 yang sudah kosong — tidak ada sel terbuang selama jumlah elemen < SIZE.
 - **`isFull`: `(REAR+1)%SIZE == FRONT`** — "slot berikutnya dari REAR adalah FRONT" berarti lingkaran penuh. Konsekuensinya ada **satu sel yang selalu dikorbankan** (kapasitas efektif SIZE−1) agar kondisi full bisa dibedakan dari kondisi `FRONT == REAR` yang dipakai untuk... elemen tunggal! Alternatif tanpa korban: simpan `count` terpisah (Tugas 3) — full saat `count == SIZE`, empty saat `count == 0`.
@@ -154,22 +268,30 @@ public:
 
 ### 4.3 Priority Queue (pengenalan, STL)
 
-**Ide:** bukan FIFO murni — yang keluar duluan adalah prioritas tertinggi (diimplementasikan dengan **heap**, bukan array geser). Contoh: IGD rumah sakit, penjadwalan CPU, printer VIP.
+**Ide sederhana:** bukan antre biasa. Yang keluar duluan = yang paling penting. Contoh: pasien gawat darurat boleh maju duluan. Di komputer ini disebut *heap (tumpukan prioritas)*, bukan array geser.
 
 ```cpp
 #include <queue>
 #include <iostream>
 using namespace std;
+// Simpan ke file queue_prioritas.cpp
 int main() {
     priority_queue<int> pq; // max-heap: terbesar keluar dulu
+    cout << "Masuk: 30, 10, 50" << endl;
     pq.push(30); pq.push(10); pq.push(50);
+    cout << "Keluar (yang besar dulu): ";
     while (!pq.empty()) { cout << pq.top() << " "; pq.pop(); }
+    cout << endl;
     // output: 50 30 10
     return 0;
 }
 ```
 
-**Penjelasan:**
+**Cara menjalankan:** `g++ -std=c++17 queue_prioritas.cpp -o queue_prioritas` lalu `./queue_prioritas`. Output: `Keluar (yang besar dulu): 50 30 10`.
+
+> **Kata sulit = arti mudah:** *priority (prioritas)* = tingkat penting. *heap* = cara simpan data biar yang paling penting selalu di atas.
+
+**Penjelasan (kalimat pendek):**
 
 - `priority_queue<int> pq` — default = **max-heap**: `top()` selalu elemen terbesar, bukan yang terdahulu. Push 30,10,50 → internal heap menata ulang (bukan urutan insert).
 - `push` O(log n) (naik/turun heap), `top` O(1), `pop` O(log n) — sedikit lebih mahal dari queue biasa O(1), harga untuk prioritas.
@@ -221,6 +343,8 @@ int main() {
 3. **Printer:** push 3 dokumen (VIP di tengah) → heap menaikkan VIP ke top. Loop `while (!empty()) { top; pop; }` mencetak: "Surat-Penting-VIP", lalu dua sisanya (urutan keduanya tak dijamin karena prioritas sama — heap tidak stabil!). Pelajaran: untuk prioritas sama + butuh FIFO, tambahkan nomor antre sebagai tie-breaker di comparator.
 4. **Perbandingan:** bank memakai `queue` (O(1), adil), printer memakai `priority_queue` (O(log n), mengutamakan penting). Memilih yang salah = VIP menunggu (rugi) atau pasien gawat ikut antre (fatal).
 
+**Cara menjalankan:** simpan ke `bank_printer.cpp`, lalu `g++ -std=c++17 bank_printer.cpp -o bank_printer` lalu `./bank_printer`.
+
 **Contoh output:**
 ```
 Melayani: Ahmad
@@ -231,6 +355,8 @@ Urutan cetak:
 - Dokumen-10hlm
 - Tugas-5hlm
 ```
+
+> **Bahasa mudah:** bank = antre adil (siapa dulu, dia dulu). Printer VIP = yang penting boleh nyalip. Dua-duanya pakai kode yang sudah ada `main`-nya, tinggal copy semua lalu jalan.
 
 ## 6. Tugas Praktikum 🧩
 

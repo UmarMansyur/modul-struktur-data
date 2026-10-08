@@ -3,6 +3,16 @@
 > **Mata Kuliah:** Struktur Data | **Program Studi:** Teknik Informatika – UNIRA
 > **Durasi:** 2 × 100 menit | **Prasyarat:** Dasar Pemrograman
 
+> **Cara menjalankan semua kode di modul ini (baca dulu, 1 menit):**
+> 1. Copy satu blok kode utuh (dari `#include` sampai `return 0`) ke file, mis. `kartu.cpp`.
+> 2. Buka terminal di folder itu, ketik `g++ -std=c++17 kartu.cpp -o kartu` lalu `./kartu` (di Windows `.\kartu.exe`).
+> 3. Semua kode di modul ini sudah lengkap dengan `main` + contoh output, jadi tinggal copy-paste-jalan.
+>
+> **Kata sulit = arti mudah di modul ini:**
+> - *Time complexity (kecepatan tumbuh)* = kalau data tambah banyak, waktu ikut tambah seberapa cepat.
+> - *Space complexity (memori tambahan)* = butuh tempat ekstra seberapa banyak.
+> - *Pointer (`*`, alamat)* = kertas berisi alamat rumah. *Reference (`&`, nama kedua)* = nama panggilan rumah yang sama.
+
 ## 1. Capaian Pembelajaran
 
 Setelah menyelesaikan modul ini, mahasiswa mampu:
