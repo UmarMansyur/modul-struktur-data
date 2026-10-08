@@ -1,18 +1,24 @@
-# Modul 6: Graph (Graf)
+# Modul 6: Graf (*Graph*)
 
-> **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 2–3 (Stack, Queue)
+> **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 2–3 (tumpukan dan antrean)
 
-> **Cara menjalankan:** kode dasar `graph.cpp` dan studi kasus `rute.cpp` sudah lengkap dengan `main`. Simpan utuh, lalu `g++ -std=c++17 graph.cpp -o graph` lalu `./graph` (sama untuk `rute.cpp`).
+> **Panduan menjalankan program:**
+> 1. Simpan contoh dasar sebagai `graph.cpp` atau contoh studi kasus sebagai `rute.cpp`.
+> 2. Kompilasi program, misalnya dengan perintah `g++ -std=c++17 graph.cpp -o graph`.
+> 3. Jalankan program dengan perintah `./graph` pada Linux/macOS atau `.\graph.exe` pada Windows.
+> 4. Bandingkan keluaran program dengan contoh keluaran pada bagian terkait.
 
 ## 1. Capaian Pembelajaran
 
-1. Menjelaskan Vertex, Edge, Directed vs Undirected, Weighted vs Unweighted.
-2. Mengimplementasikan Adjacency Matrix & Adjacency List.
-3. Mengimplementasikan BFS (dengan Queue) dan DFS (dengan Stack/rekursi).
-4. Menyelesaikan studi kasus rute terpendek / jaringan sosial.
-5. Menjelaskan sejarah Graph (Euler–Königsberg) dan merefleksikan nilai filosofisnya (keterhubungan).
+Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-## 2. Sejarah & Nilai Filosofis
+1. Menjelaskan simpul, sisi, graf berarah, graf tidak berarah, graf berbobot, dan graf tidak berbobot.
+2. Mengimplementasikan matriks ketetanggaan dan daftar ketetanggaan.
+3. Mengimplementasikan BFS dengan antrean dan DFS dengan tumpukan atau rekursi.
+4. Menyelesaikan studi kasus rute terpendek atau jaringan sosial.
+5. Menjelaskan sejarah teori graf serta menganalisis peran keterhubungan dalam suatu sistem.
+
+## 2. Sejarah dan Nilai Filosofis
 
 **Sejarah singkat.** Teori graf lahir dari teka-teki jembatan! Tahun 1736, **Leonhard Euler** membuktikan warga Königsberg tidak bisa menyeberangi ketujuh jembatan kota tepat sekali lalu kembali ke awal — dan dari bukti itu lahir teori graf (derajat ganjil/genap, Eulerian trail). Dua abad kemudian graf menjadi bahasa universal: peta, jaringan listrik, internet, hingga jejaring sosial. **Edsger Dijkstra (1956/1959)** menemukan algoritma jalur terpendek berbobot (setiap GPS memakainya), sementara BFS/DFS menjadi cara baku menjelajahi graf — BFS dengan queue (Modul 3!), DFS dengan stack/rekursi (Modul 2!). Tanpa graf + BFS, tidak ada Google Maps, tidak ada "saran teman", tidak ada routing paket internet.
 
@@ -27,15 +33,15 @@
 
 > Renungan untuk laporan: petakan 6–8 orang terdekat Anda sebagai graf (undirected untuk pertemanan, directed untuk "mengagumi"). Hitung derajat tiap orang, temukan siapa "penghubung" (artikulasi intuitif), lalu jawab: edge apa yang jika putus akan memisahkan graf — dan apa maknanya?
 
-## 3. Konsep & Representasi (diperdalam)
+## 3. Konsep dan Representasi
 
-- **Vertex (simpul):** entitas (kota, pengguna). **Edge (sisi):** relasi (jalan, pertemanan).
-- **Undirected:** A—B (dua arah, misal pertemanan). **Directed:** A→B (satu arah, misal follow). **Weighted:** edge punya bobot (jarak/biaya); unweighted hanya ada/tidak.
-- **Adjacency Matrix** `V×V`: cek edge O(1), tapi memori O(V²) — boros untuk graf besar jarang. **Adjacency List** `vector<vector<int>>`: hanya menyimpan edge yang ada, O(V+E) — standar praktikum dan industri untuk graf sparse.
+- **Simpul (*vertex*)** mewakili entitas, seperti kota atau pengguna. **Sisi (*edge*)** mewakili hubungan, seperti jalan atau pertemanan.
+- **Graf tidak berarah (*undirected*)** menyatakan hubungan dua arah, seperti A—B. **Graf berarah (*directed*)** menyatakan hubungan satu arah, seperti A→B. **Graf berbobot (*weighted*)** menyimpan nilai jarak, biaya, atau waktu pada setiap sisi.
+- **Matriks ketetanggaan (*adjacency matrix*)** berukuran `V × V` dan dapat memeriksa keberadaan sisi dalam O(1), tetapi membutuhkan memori O(V²). **Daftar ketetanggaan (*adjacency list*)** hanya menyimpan sisi yang ada dan membutuhkan memori O(V + E). Daftar ketetanggaan biasanya lebih sesuai untuk graf besar yang jarang.
 
 > Visualisasi interaktif: **VisuAlgo DFS/BFS** – https://visualgo.net/en/dfsbfs (buka saat praktikum, jalankan langkah demi langkah)
 
-### BFS vs DFS
+### Perbandingan BFS dan DFS
 
 ![BFS step 0](https://cdn.programiz.com/sites/tutorial2program/files/graph-bfs-step-0.png)
 *Gambar 1. Persiapan BFS: queue + visited. Sumber: Programiz.*
@@ -54,7 +60,7 @@
 | Cocok | Koneksi terdekat, rute tersedikit | Deteksi cycle, topological sort, maze, komponen |
 | Analogi | Riak air melebar | Penyelam gua dengan tali |
 
-### Matrix vs List: kapan memakai apa? (pendalaman)
+### Perbandingan Matriks dan Daftar Ketetanggaan
 
 | Aspek | Adjacency Matrix (`V×V`) | Adjacency List (`vector<vector<int>>`) |
 |---|---|---|
@@ -63,9 +69,9 @@
 | Iterasi tetangga | O(V) selalu (scan baris) | O(derajat) — pas untuk BFS/DFS |
 | Cocok | Graf kecil/padat, Floyd-Warshall | Graf besar/jarang (jalan, sosmed) — pilihan default |
 
-Aturan praktis: V ≤ 200 dan butuh cek edge cepat → matrix. V besar + E sedikit (peta kota, follow graph) → list. Weighted: matrix simpan bobot (0/∞ = tak ada edge), list simpan `pair<tetangga,bobot>`.
+Gunakan matriks ketetanggaan ketika jumlah simpul relatif kecil dan program sering memeriksa keberadaan sisi. Gunakan daftar ketetanggaan ketika jumlah simpul besar tetapi jumlah sisi relatif sedikit. Pada graf berbobot, matriks menyimpan bobot pada setiap sel, sedangkan daftar menyimpan pasangan `tetangga` dan `bobot`.
 
-### Taksonomi graf yang wajib bisa disebutkan
+### Jenis-Jenis Graf
 
 - **Directed vs Undirected:** follow (satu arah) vs pertemanan (dua arah). `addEdge(u,v,true)` = directed.
 - **Weighted vs Unweighted:** berbobot (jarak/biaya → Dijkstra) vs tak berbobot (BFS cukup).
@@ -81,15 +87,15 @@ Aturan praktis: V ≤ 200 dan butuh cek edge cepat → matrix. V besar + E sedik
 4. **DFS rekursif terlalu dalam** → stack overflow pada graf garis panjang. Solusi: versi iteratif dengan `stack<int>` eksplisit.
 5. **Directed disimpan dua arah** (lupa flag) → hasil BFS/DFS salah arah (follow dianggap pertemanan).
 
-### Graph di dunia nyata
+### Penerapan Graf
 
 - **Maps & logistik:** rute terpendek (BFS tak berbobot, Dijkstra berbobot), ojek online, armada.
 - **Sosial:** saran teman (jarak 2 = teman-dari-teman), influencer (derajat tinggi), komunitas (komponen/klaster).
 - **Sistem:** dependensi package, jadwal kuliah (topological sort DAG), deteksi deadlock (cycle!), jaringan komputer (routing).
 
-## 4. Implementasi (Adjacency List, C++)
+## 4. Implementasi Daftar Ketetanggaan dalam C++
 
-**Tujuan kode:** satu class graf tak-berarah yang menunjukkan (a) pembangunan adjacency list, (b) BFS iteratif dengan queue, (c) DFS rekursif — ketiganya pola yang dipakai ulang di studi kasus.
+**Tujuan program:** Program membangun kelas graf tidak berarah dengan daftar ketetanggaan, menjalankan BFS iteratif menggunakan antrean, dan menjalankan DFS secara rekursif. Studi kasus pada bagian berikutnya menggunakan kembali ketiga pola tersebut.
 
 ```cpp
 #include <iostream>
@@ -165,7 +171,7 @@ BFS dari 0: 0 1 2 3 4 5
 DFS dari 0: 0 1 3 4 2 5
 ```
 
-## 5. Studi Kasus: Jaringan Sosial & Rute Terpendek
+## 5. Studi Kasus: Jaringan Sosial dan Rute Terpendek
 
 **Soal:** (1) dari seorang pengguna, temukan semua koneksi per derajat (teman, teman-dari-teman, ...); (2) pada peta kota tak-berbobot, cari rute pemberhentian tersedikit. Keduanya = BFS yang **mencatat jarak + predecessor**, bukan sekadar mencetak.
 
@@ -247,11 +253,11 @@ Rute 0 -> 6: 0 -> 1 -> 4 -> 6
 Jumlah pemberhentian 0->6 = 3
 ```
 
-> **Kata sulit = arti mudah:**
-> - *Vertex (titik)* = kota / orang. *Edge (jalan)* = hubungan / jalan antara kota.
-> - *BFS (jalan melebar)* = cek semua tetangga dekat dulu baru yang jauh. Pakai antrean. Dijamin dapat yang terpendek.
-> - *DFS (jalan menyelam)* = ikut satu jalan sampai mentok baru balik. Pakai tumpukan. Cocok untuk cari jalan buntu.
-> - *Jarak* = jumlah jalan yang dilewati. *Prev (sebelumnya)* = ingatan "saya sampai sini dari mana" biar bisa susun rute pulang.
+> **Istilah penting:**
+> - **Simpul (*vertex*)** mewakili kota atau pengguna, sedangkan **sisi (*edge*)** mewakili jalan atau hubungan.
+> - **BFS** mengunjungi simpul berdasarkan tingkat kedekatannya dengan menggunakan antrean. Pada graf tidak berbobot, BFS menjamin jarak dengan jumlah sisi paling sedikit.
+> - **DFS** mengikuti satu jalur hingga tidak dapat melanjutkan, kemudian kembali ke simpul sebelumnya. DFS menggunakan tumpukan atau rekursi.
+> - **Jarak** menyatakan jumlah sisi yang dilalui. Larik **`prev`** menyimpan simpul pendahulu agar program dapat menyusun kembali rute.
 
 **Penjelasan rancangan (untuk diimplementasikan sebagai Tugas 2):**
 
@@ -265,9 +271,9 @@ Jumlah pemberhentian 0->6 = 3
 
 ## 6. Tugas Praktikum 🧩
 
-> Kumpulkan tiap tugas sebagai **file `.cpp` + screenshot output + analisis di laporan**. Pastikan `g++ -std=c++17` tanpa error.
+> Kumpulkan setiap tugas dalam bentuk **berkas `.cpp`, tangkapan layar keluaran, dan analisis dalam laporan**. Pastikan `g++ -std=c++17` dapat mengompilasi program tanpa galat.
 
-### 🟢 Level Beginner — *Membangun & Menjelajah*
+### 🟢 Tingkat Dasar — *Membangun dan Menjelajahi*
 
 **Tugas B1: Matrix + Derajat + Tampil Tetangga (wajib).**
 1. Buat class `GraphMatrix` (V=6, `int mat[V][V]` nol semua): `addEdge(u,v)` undirected + `hitungDerajat(v)` (jumlah 1 di baris v) + `tampilTetangga(v)`.
@@ -281,7 +287,7 @@ Jumlah pemberhentian 0->6 = 3
 3. Jawab: struktur data apa di balik tiap algoritma (queue vs stack) dan apa yang terjadi jika `visited` dihapus? (prediksi + buktikan dengan menghapusnya!).
 *Kriteria nilai:* kedua output benar (40%), dua trace (35%), jawaban struktur + eksperimen visited (25%).
 
-### 🟡 Level Medium — *Jarak & Komponen*
+### 🟡 Tingkat Menengah — *Jarak dan Komponen*
 
 **Tugas M1: BFS Jarak + Predecessor + Rute (inti studi kasus).**
 1. Implementasikan `BFSJarak(start)` yang mengembalikan `jarak[]` dan `prev[]` sesuai rancangan studi kasus + fungsi `cetakRute(target)` (telusuri prev mundur, lalu balik).
@@ -295,7 +301,7 @@ Jumlah pemberhentian 0->6 = 3
 3. Analisis: mengapa `addEdge` undirected menyimpan 2× (memori 2E) dan kapan directed wajib dipakai? (beri 2 contoh nyata).
 *Kriteria nilai:* komponen + directed benar (50%), dua uji asimetri (25%), analisis memori + contoh (25%).
 
-### 🔴 Level Expert — *Cycle, Topologi & Berbobot*
+### 🔴 Tingkat Lanjut — *Siklus, Topologi, dan Bobot*
 
 **Tugas E1: Deteksi Cycle Directed (3-warna).**
 1. Implementasikan `punyaCycle()` dengan DFS + status `0=putih(belum),1=abu(sedang diproses),2=hitam(selesai)`: bertemu tetangga abu → cycle! Uji: segitiga `0→1→2→0` (cycle!) vs `0→1→2` (aman) vs undirected `0-1-2-0` (jelaskan mengapa versi undirected butuh aturan parent, bukan 3-warna polos).

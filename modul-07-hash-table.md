@@ -1,17 +1,23 @@
-# Modul 7 (Pengayaan): Hash Table
+# Modul 7 (Pengayaan): Tabel Hash (*Hash Table*)
 
-> **Mata Kuliah:** Struktur Data | **Durasi:** 1 × 100 menit (opsional) | **Prasyarat:** Modul 4 (Linked List)
+> **Mata Kuliah:** Struktur Data | **Durasi:** 1 × 100 menit (opsional) | **Prasyarat:** Modul 4 (senarai berantai)
 
-> **Cara menjalankan:** kode `kamus.cpp` (chaining), `probing.cpp` (linear probing), dan `eksperimen_hash.cpp` (studi kasus) sudah lengkap dengan `main`. Simpan utuh, lalu `g++ -std=c++17 kamus.cpp -o kamus` lalu `./kamus`.
+> **Panduan menjalankan program:**
+> 1. Simpan contoh *chaining* sebagai `kamus.cpp`, contoh *linear probing* sebagai `probing.cpp`, atau studi kasus sebagai `eksperimen_hash.cpp`.
+> 2. Kompilasi program, misalnya dengan perintah `g++ -std=c++17 kamus.cpp -o kamus`.
+> 3. Jalankan program dengan perintah `./kamus` pada Linux/macOS atau `.\kamus.exe` pada Windows.
+> 4. Bandingkan keluaran program dengan contoh keluaran pada bagian terkait.
 
 ## 1. Capaian Pembelajaran
 
-1. Menjelaskan Hash Function, key → index, dan load factor.
-2. Menangani collision dengan Chaining & Open Addressing.
-3. Menyelesaikan studi kasus kamus kata / pemetaan ID pengguna.
-4. Menjelaskan sejarah Hash Table dan merefleksikan nilai filosofisnya (sidik jari & tabrakan yang tak terhindarkan).
+Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-## 2. Sejarah & Nilai Filosofis
+1. Menjelaskan fungsi hash, pemetaan kunci ke indeks, dan faktor muat.
+2. Menangani tabrakan dengan metode *chaining* dan *open addressing*.
+3. Menyelesaikan studi kasus kamus kata atau pemetaan ID pengguna.
+4. Menjelaskan sejarah tabel hash dan menganalisis pengaruh tabrakan terhadap kinerja.
+
+## 2. Sejarah dan Nilai Filosofis
 
 **Sejarah singkat.** Gagasan memetakan data besar ke indeks kecil lahir di IBM 1950-an: **Hans Peter Luhn (1953)** memakai hashing untuk pencarian, disusul **Peterson (1957)** yang menganalisis open addressing. Istilah *hash* sendiri dipopulerkan dari kata "chop and mix" (mencacah-aduk, seperti *hash brown* — kentang yang dicacah!). Varian chaining (bucket = list, Modul 4 kembali beraksi!) vs open addressing (semua di array, warisan Knuth) menjadi dua mazhab abadi. Dari sini lahir `unordered_map` C++, `HashMap` Java, `dict` Python, hingga fungsi kriptografis (MD5, SHA) dan blockchain — semuanya "sidik jari digital": data raksasa diringkas menjadi kode pendek yang (hampir) unik.
 
@@ -25,9 +31,9 @@
 
 > Renungan untuk laporan: jika nama Anda di-hash (jumlah ASCII % 10), bucket berapa Anda? Cari 1 teman yang se-bucket (collision!) dengan Anda — lalu diskusikan: apakah chaining (berbagi bucket dengan rukun) atau probing (salah satu pindah) yang lebih adil untuk kasus itu?
 
-## 3. Konsep (diperdalam)
+## 3. Konsep Dasar
 
-Hash Table = array + **fungsi hash** `h(k)` yang memetakan key (string/NIM) ke indeks. Jika fungsi bagus + tabel cukup longgar, insert/search/delete rata-rata **O(1)** — lebih cepat dari BST O(log n) dan array O(n). Worst case (semua key menumpuk di 1 bucket) merosot ke O(n), sehingga penanganan collision menentukan kualitas.
+Tabel hash menggabungkan larik dengan **fungsi hash** `h(k)` yang memetakan kunci, seperti string atau NIM, ke suatu indeks. Fungsi hash yang baik dan tabel yang tidak terlalu penuh memungkinkan operasi penyisipan, pencarian, dan penghapusan berjalan dalam kompleksitas rata-rata O(1). Pada kasus terburuk, semua kunci dapat menumpuk dalam satu *bucket* sehingga kompleksitasnya menurun menjadi O(n). Oleh karena itu, strategi penanganan tabrakan sangat memengaruhi kinerja tabel hash.
 
 ![Konsep key-value](https://cdn.programiz.com/sites/tutorial2program/files/Hash-0.png)
 *Gambar 1. Pemetaan key → value. Sumber: Programiz.*
@@ -38,24 +44,24 @@ Hash Table = array + **fungsi hash** `h(k)` yang memetakan key (string/NIM) ke i
 ![Chaining](https://cdn.programiz.com/sites/tutorial2program/files/Hash-3_1.png)
 *Gambar 3. Collision ditangani dengan chaining (linked list). Sumber: Programiz.*
 
-- **Collision (tabrakan):** dua key berbeda → indeks sama. Tak terhindarkan jika ruang key > ukuran tabel (prinsip pigeonhole) — jadi strateginya **menangani**, bukan mencegah total.
-- **Load factor** `α = n / m` (n = elemen, m = bucket). Praktik: jika α > 0.7–0.75, **rehashing** (buat tabel ~2× + pindahkan semua) agar chain tetap pendek.
-- **Chaining:** tiap bucket = linked list penampung. **Open Addressing:** semua di array; yang tabrakan mencari slot kosong lain (linear probing `h+i`, quadratic `h+i²`, double hashing).
+- **Tabrakan (*collision*)** terjadi ketika dua kunci berbeda menghasilkan indeks yang sama. Kondisi ini tidak dapat dihilangkan sepenuhnya apabila ruang kunci lebih besar daripada ukuran tabel. Implementasi tabel hash harus menyediakan strategi untuk menanganinya.
+- **Faktor muat (*load factor*)** dihitung dengan rumus `α = n / m`, dengan `n` sebagai jumlah elemen dan `m` sebagai jumlah *bucket*. Ketika nilai `α` melampaui sekitar 0,70–0,75, program biasanya melakukan *rehashing* dengan memperbesar tabel dan memetakan ulang semua kunci.
+- Metode **chaining** menyimpan beberapa elemen dalam satu *bucket* dengan senarai berantai. Metode **open addressing** menyimpan semua elemen dalam larik dan mencari slot lain ketika terjadi tabrakan, misalnya melalui *linear probing*, *quadratic probing*, atau *double hashing*.
 
 > Visualisasi interaktif: **VisuAlgo Hash Table** – https://visualgo.net/en/hashtable (coba insert key yang sengaja collision dan bandingkan chaining vs probing)
 
-### Anatomi fungsi hash yang baik (pendalaman)
+### Karakteristik Fungsi Hash yang Baik
 
 Fungsi hash ideal memenuhi 4 sifat: (1) **deterministik** (key sama → indeks sama, selalu), (2) **cepat** O(panjang key), (3) **seragam** (menyebar ke semua bucket, tidak menumpuk), (4) **avalanche** (perubahan 1 karakter mengubah banyak bit hash). Bandingkan:
 - **Naif (jumlah ASCII):** `h = Σc % m`. Cepat tapi buta urutan ("ab"="ba"="12"), mudah menumpuk (anagram collision).
 - **Polynomial rolling (kode 3.1):** `h = (h×31 + c) % m`. Sensitif urutan (×31 menggeser digit), prima 31 = `(h<<5)−h` (cepat di CPU). Inilah yang dipakai `String.hashCode()` Java!
 - **Aturan praktis:** pilih `m` prima (mengurangi pola periodik), jaga α < 0.75, dan uji empiris (studi kasus!) — teori tanpa ukur = spekulasi.
 
-### Load factor & rehashing: kapan memperbesar rumah?
+### Faktor Muat dan *Rehashing*
 
 `α = n/m`. Chain rata-rata ≈ α (chaining) — α=2 berarti tiap search memindai ~2 node: masih O(1) dengan konstanta 2. Tetapi α=10 = daftar tersamar (O(n) praktis!). Praktik industri: saat α > 0.7–0.75, buat tabel ~2× (prima berikutnya) dan **hash ulang semua key** (wajib — karena `h` tergantung `m`!). Biaya rehash O(n) sesekali, tetapi menjaga operasi berikut tetap O(1) amortized — seperti pindah rumah: mahal sekali, nyaman seterusnya.
 
-### Chaining vs Open Addressing (pilih dengan sadar)
+### Perbandingan *Chaining* dan *Open Addressing*
 
 | Aspek | Chaining | Open Addressing (probing) |
 |---|---|---|
@@ -74,7 +80,7 @@ Fungsi hash ideal memenuhi 4 sifat: (1) **deterministik** (key sama → indeks s
 5. **Delete probing dikosongkan fisik** (bukan `DELETED`) → pencarian seberang slot terputus prematur.
 6. **Memakai hash untuk prefix/autocomplete** → hash dirancang acak; pencarian awalan butuh Trie (Tugas M2!).
 
-### Hash di dunia nyata
+### Penerapan Tabel Hash
 
 - **Login & kamus:** `unordered_map<string,...>` untuk sesi, cache, frekuensi kata.
 - **Database & compiler:** symbol table, indeks.
@@ -83,9 +89,9 @@ Fungsi hash ideal memenuhi 4 sifat: (1) **deterministik** (key sama → indeks s
 
 ## 4. Implementasi
 
-### 4.1 Chaining (STL `list`)
+### 4.1 *Chaining* dengan STL `list`
 
-**Tujuan kode:** hash table string→string lengkap (insert/update/search/delete) memakai `vector<list<...>>` — tiap bucket adalah linked list pasangan key-value. Pola ini = `unordered_map` yang disederhanakan.
+**Tujuan program:** Program membangun tabel hash `string` ke `string` yang mendukung penyisipan, pembaruan, pencarian, dan penghapusan. Implementasi menggunakan `vector<list<...>>`, sehingga setiap *bucket* berisi senarai pasangan kunci–nilai. Pola ini merupakan bentuk sederhana dari `unordered_map`.
 
 ```cpp
 #include <iostream>
@@ -157,14 +163,14 @@ meja tidak ketemu (contoh cek nullptr)
 sesudah hapus buku, cari buku: sudah hilang
 ```
 
-> **Kata sulit = arti mudah:**
-> - *Hash Table (tabel sidik jari)* = lemari berisi banyak laci bernomor. Nama barang diubah jadi nomor laci pakai rumus.
-> - *Hash function (rumus laci)* = rumus `h = (h*31 + huruf) % jumlah_laci`. Huruf yang sama selalu dapat laci yang sama.
-> - *Key (kunci)* = nama barang, mis. `"apel"`. *Value (isi)* = arti barang, mis. `"buah merah"`.
-> - *Collision (tabrakan)* = dua nama beda tapi dapat laci yang sama. Wajar, tinggal berbagi laci (chaining).
-> - *Chaining (berbagi laci)* = satu laci boleh isi banyak barang yang digantung berantai (list).
+> **Istilah penting:**
+> - **Tabel hash (*hash table*)** menyimpan data pada sejumlah *bucket* yang memiliki indeks.
+> - **Fungsi hash** mengubah kunci menjadi indeks, misalnya melalui rumus `h = (h * 31 + karakter) % jumlah_bucket`.
+> - **Kunci (*key*)** mengidentifikasi data, sedangkan **nilai (*value*)** menyimpan informasi yang terkait dengan kunci tersebut.
+> - **Tabrakan (*collision*)** terjadi ketika dua kunci berbeda menghasilkan indeks yang sama.
+> - Metode **chaining** menyimpan beberapa pasangan kunci–nilai dalam satu *bucket* dengan menggunakan senarai.
 
-**Penjelasan per fungsi:**
+**Penjelasan setiap fungsi:**
 
 - **`hashFunc` (polynomial rolling):** `h = (h×31 + c) % SIZE` per karakter. Mengapa ×31? (a) menggeser kontribusi karakter lama ke digit tinggi sehingga **urutan berpengaruh** ("ab" ≠ "ba" — tidak seperti jumlah ASCII polos), (b) 31 prima kecil yang dikompilasi jadi `(h<<5)−h` (cepat). Modulo tiap langkah menjaga `h` tetap dalam int (tanpa ini, string panjang overflow). Hasil 0..SIZE−1 = indeks bucket. Kualitas fungsi ini vs jumlah-ASCII adalah inti eksperimen studi kasus.
 - **Konstruktor `table(m)`:** membuat `m` list kosong. `SIZE` disimpan karena dipakai `hashFunc` — konsekuensinya fungsi hash **terikat ukuran tabel**; saat rehash (ukuran berubah), semua key harus di-hash ulang (tidak bisa sekadar salin).
@@ -173,9 +179,9 @@ sesudah hapus buku, cari buku: sudah hilang
 - **`remove`:** `remove_if` + lambda menghapus semua node ber-key cocok dari list bucket. O(1 + α). Tidak perlu re-hash sisanya (kelebihan chaining atas probing — lihat 3.2).
 - **`main`:** tabel 10 bucket, 2 insert (kemungkinan beda bucket), search "apel" → hash → ketemu → cetak "buah merah". Load factor 0.2 — chain pasti panjang 1.
 
-### 4.2 Open Addressing – Linear Probing
+### 4.2 *Open Addressing* dengan *Linear Probing*
 
-**Ide:** tanpa list — semua pasangan tinggal di array. Jika slot `h` terisi key lain, coba `h+1, h+2, ...` (modulo) sampai kosong/ketemu. Hemat pointer, cache-friendly, tapi rapuh saat penghapusan.
+**Gagasan utama:** Implementasi menyimpan seluruh pasangan kunci–nilai di dalam larik. Jika slot `h` sudah berisi kunci lain, algoritma memeriksa `h + 1`, `h + 2`, dan seterusnya secara modulo sampai menemukan slot kosong atau kunci yang dicari. Pendekatan ini menghemat penunjuk dan memanfaatkan cache dengan baik, tetapi membutuhkan penanganan khusus saat menghapus data.
 
 ```cpp
 #include <iostream>
@@ -264,9 +270,9 @@ Sesudah hapus apel, cari apel: sudah hilang
 Cari buku (harus tetap ketemu walau apel dihapus): baca
 ```
 
-> **Bahasa mudah:** kalau laci impian sudah penuh, geser ke laci sebelah (`+1`) sampai ketemu yang kosong. Kalau hapus, jangan kosongkan beneran, cukup tulis "hapus" agar pencarian yang lewat situ tidak berhenti terlalu cepat.
+> **Ringkasan:** Ketika slot awal sudah terisi, *linear probing* memeriksa slot berikutnya sampai menemukan slot kosong. Saat menghapus data, program memberi tanda `DELETED` dan tidak langsung mengosongkan slot agar proses pencarian pada rangkaian *probe* tetap berjalan dengan benar.
 
-**Penjelasan baris per baris (pola untuk Tugas 1):**
+**Penjelasan alur program:**
 
 - `h = hash(k) % m` — posisi awal ideal. `i = h` — probe mulai dari sana.
 - `while (table[i] terisi && table[i].key != k)` — berhenti pada 2 kondisi benar: slot kosong (key pasti tidak ada — karena insert pun akan berhenti di sini) atau key cocok (ketemu). Selama keduanya salah → geser `i = (i+1) % m` (bungkus ke 0).
@@ -276,7 +282,7 @@ Cari buku (harus tetap ketemu walau apel dihapus): baca
 
 ## 5. Studi Kasus: Pemetaan ID Pengguna
 
-**Soal:** 1000 mahasiswa, NIM sebagai key. Bandingkan 3 pendekatan dan ukur kualitas fungsi hash secara empiris.
+**Permasalahan:** Program mengelola data 1.000 mahasiswa dengan NIM sebagai kunci. Mahasiswa diminta membandingkan tiga pendekatan dan mengukur kualitas fungsi hash secara empiris.
 
 ```cpp
 #include <iostream>
@@ -334,7 +340,7 @@ Rumus x31 (m=7): tabrakan=5, rantai terpanjang=3
 Rumus x31 (m=29): tabrakan=0, rantai terpanjang=1
 ```
 
-> **Bahasa mudah:** makin besar lemari (`m`), makin jarang tabrakan. Rumus `x31` lebih bagus karena peduli urutan huruf, tidak cuma jumlah. `Load factor (tingkat penuh)` = isi dibagi jumlah laci. Kalau sudah > 0.75, beli lemari baru yang 2x lipat (rehashing).
+> **Ringkasan:** Tabel yang lebih besar cenderung mengurangi jumlah tabrakan. Fungsi `×31` mempertimbangkan urutan karakter sehingga biasanya menghasilkan sebaran yang lebih baik daripada penjumlahan kode karakter. Faktor muat membandingkan jumlah elemen dengan jumlah *bucket*. Ketika faktor muat melampaui ambang tertentu, program perlu memperbesar tabel dan melakukan *rehashing*.
 
 **Penjelasan rancangan eksperimen (untuk diimplementasikan):**
 
@@ -345,9 +351,9 @@ Rumus x31 (m=29): tabrakan=0, rantai terpanjang=1
 
 ## 6. Tugas Praktikum 🧩
 
-> Kumpulkan tiap tugas sebagai **file `.cpp` + screenshot output + analisis di laporan**. Pastikan `g++ -std=c++17` tanpa error.
+> Kumpulkan setiap tugas dalam bentuk **berkas `.cpp`, tangkapan layar keluaran, dan analisis dalam laporan**. Pastikan `g++ -std=c++17` dapat mengompilasi program tanpa galat.
 
-### 🟢 Level Beginner — *Hash Pertama*
+### 🟢 Tingkat Dasar — *Pengenalan Hash*
 
 **Tugas B1: Hitung Hash Tangan + Chaining Mini (wajib).**
 1. Tanpa program dulu: hitung manual `hashFunc` polynomial (×31) untuk key `"ab"`, `"ba"`, `"apel"` dengan SIZE=10 (tunjukkan langkah `h` tiap karakter!). Buktikan `"ab" ≠ "ba"` — lalu hitung versi naif jumlah-ASCII dan tunjukkan ia gagal membedakan.
@@ -361,7 +367,7 @@ Rumus x31 (m=29): tabrakan=0, rantai terpanjang=1
 3. Jawab: pada α berapa Anda memutuskan rehash? Mengapa menunggu sampai penuh itu terlambat? (hubungkan ke filosofi antisipasi).
 *Kriteria nilai:* dua eksperimen + tabel (50%), analisis prima vs kecil (25%), jawaban rehash (25%).
 
-### 🟡 Level Medium — *Collision & Struktur Pembanding*
+### 🟡 Tingkat Menengah — *Tabrakan dan Struktur Pembanding*
 
 **Tugas M1: Linear Probing Lengkap dengan `DELETED`.**
 1. Implementasikan tabel probing (`struct Slot{string key,val; bool terisi, dihapus;}`): `insert` (probe `h+i`), `search` (lompat `DELETED`, berhenti di kosong-murni), `remove` (tandai `DELETED`, bukan kosongkan!).
@@ -375,7 +381,7 @@ Rumus x31 (m=29): tabrakan=0, rantai terpanjang=1
 3. Uji: 3 prefix (mis. `"me"`, `"bu"`, `"z"`) + catat waktu/kompleksitas vs search eksak O(1).
 *Kriteria nilai:* kamus + scan-prefix jalan (40%), uji 3 prefix (25%), analisis hash-vs-Trie (35%).
 
-### 🔴 Level Expert — *Benchmark & Desain Fungsi*
+### 🔴 Tingkat Lanjut — *Benchmark dan Desain Fungsi*
 
 **Tugas E1: `unordered_map` vs `map` — Benchmark 100rb Data.**
 1. Benchmark: insert 100.000 NIM acak + 10.000 search ke `unordered_map<string,int>` vs `map<string,int>`; catat waktu (chrono) + uji iterasi terurut (map terurut, unordered acak!).

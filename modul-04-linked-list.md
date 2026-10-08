@@ -1,18 +1,25 @@
-# Modul 4: Linked List (Senarai Berantai)
+# Modul 4: Senarai Berantai (*Linked List*)
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 0–3
 
-> **Cara menjalankan:** SEMUA kode di modul ini sekarang sudah lengkap dengan `main`. Copy utuh ke file `.cpp`, lalu `g++ -std=c++17 nama.cpp -o nama` lalu `./nama`. Mulai dari `linkedlist.cpp` dulu karena itu yang paling dasar.
+> **Panduan menjalankan program:**
+> 1. Mulailah dengan contoh dasar pada `linkedlist.cpp`.
+> 2. Salin satu contoh program secara utuh ke dalam berkas `.cpp`.
+> 3. Kompilasi program dengan perintah `g++ -std=c++17 nama.cpp -o nama`.
+> 4. Jalankan program dengan perintah `./nama` pada Linux/macOS atau `.\nama.exe` pada Windows.
+> 5. Bandingkan keluaran program dengan contoh keluaran pada bagian terkait.
 
 ## 1. Capaian Pembelajaran
 
-1. Menjelaskan konsep dynamic memory (`new`/`delete`), Node, Head, Tail.
-2. Mengimplementasikan Single Linked List (insert/delete first/last/after).
-3. Menjelaskan Double & Circular Linked List.
-4. Menyelesaikan studi kasus antrean pelanggan berbasis Linked List.
-5. Menjelaskan sejarah Linked List dan merefleksikan nilai filosofisnya (kebebasan terhubung & amanah memori).
+Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-## 2. Sejarah & Nilai Filosofis
+1. Menjelaskan konsep memori dinamis, `new`, `delete`, simpul, `head`, dan `tail`.
+2. Mengimplementasikan operasi penyisipan dan penghapusan pada senarai berantai tunggal.
+3. Menjelaskan karakteristik senarai berantai ganda dan senarai berantai melingkar.
+4. Menyelesaikan studi kasus antrean pelanggan dengan menggunakan senarai berantai.
+5. Menjelaskan sejarah senarai berantai dan menerapkan pengelolaan memori secara bertanggung jawab.
+
+## 2. Sejarah dan Nilai Filosofis
 
 **Sejarah singkat.** Linked list lahir bersama kecerdasan buatan! Pada 1955–1956, **Allen Newell, Cliff Shaw, dan Herbert Simon** menciptakan bahasa **IPL (Information Processing Language)** untuk program *Logic Theorist* — program pertama yang membuktikan teorema matematika otomatis. Mereka butuh memori yang bisa tumbuh-tumbuh kapan saja (simbol logika datang tak terduga), dan array kaku tidak cukup. Solusinya: pecah data menjadi *node* yang saling menunjuk lewat pointer. Ide ini diwariskan ke **LISP (John McCarthy, 1958)** — bahasa AI legendaris di mana *segala sesuatu adalah list* (`(1 2 3)` bahkan program itu sendiri list!). Setiap `new`/`delete`, `malloc`/`free`, bahkan garbage collector bahasa modern, adalah keturunan langsung ide 1955 ini.
 
@@ -26,9 +33,9 @@
 
 > Renungan untuk laporan: bandingkan array (kontrak tetap) vs linked list (janji fleksibel) dengan pengalaman organisasi/kepanitiaan Anda. Kapan aturan kaku menyelamatkan, kapan kelenturan menyelamatkan? Apa "memory leak" dalam organisasi (amanah yang bocor)?
 
-## 3. Konsep Dasar (diperdalam)
+## 3. Konsep Dasar
 
-Linked List = kumpulan **node** yang tiap node menyimpan `data` + `pointer next`. Berbeda dengan array, ukurannya **dinamis** dan tidak harus bersebelahan di memori. Konsekuensinya: insert/delete di ujung (atau posisi yang pointer-nya sudah diketahui) bisa O(1), tapi akses indeks ke-i harus traversal O(n) dari head.
+Senarai berantai merupakan kumpulan **simpul (*node*)**. Setiap simpul menyimpan `data` dan penunjuk `next` yang mengarah ke simpul berikutnya. Berbeda dari larik, simpul-simpul tersebut tidak harus menempati lokasi yang bersebelahan di memori. Senarai dapat bertambah atau berkurang secara dinamis. Penyisipan atau penghapusan pada posisi yang penunjuknya sudah diketahui dapat dilakukan dalam O(1), sedangkan akses ke elemen ke-`i` memerlukan penelusuran dari `head` dengan kompleksitas O(n).
 
 ![Konsep HEAD -> node -> NULL](https://cdn.programiz.com/sites/tutorial2program/files/linked-list-concept.png)
 *Gambar 1. Struktur dasar linked list. Sumber: Programiz.*
@@ -41,11 +48,11 @@ Linked List = kumpulan **node** yang tiap node menyimpan `data` + `pointer next`
 
 | Jenis | Ciri | Kelebihan | Harga yang dibayar |
 |---|---|---|---|
-| Single | `next` satu arah, tail → `nullptr` | Simpel, hemat memori | Hapus belakang O(n), tak bisa mundur |
-| Double | `prev` + `next`, traversal dua arah | Hapus node diketahui O(1), bisa mundur | 1 pointer ekstra per node |
-| Circular | Tail → Head (tidak ada `nullptr`) | Cocok round-robin / antre melingkar | Loop tak sengaja = infinite loop |
+| Tunggal | `next` satu arah, `tail` → `nullptr` | Sederhana dan hemat memori | Penghapusan dari belakang O(n) dan tidak dapat bergerak mundur |
+| Ganda | `prev` dan `next`, penelusuran dua arah | Dapat menghapus simpul yang diketahui dalam O(1) | Membutuhkan satu penunjuk tambahan per simpul |
+| Melingkar | `tail` → `head`, tanpa `nullptr` di ujung | Sesuai untuk *round-robin* atau antrean melingkar | Kondisi berhenti yang salah dapat menimbulkan perulangan tak berhingga |
 
-### Array vs Linked List: kapan memakai apa? (pendalaman)
+### Perbandingan Larik dan Senarai Berantai
 
 | Aspek | Array / Vector | Linked List |
 |---|---|---|
@@ -56,9 +63,9 @@ Linked List = kumpulan **node** yang tiap node menyimpan `data` + `pointer next`
 | Ukuran | Tetap / tumbuh berkala (realloc) | Tumbuh satu per satu |
 | Kegagalan khas | Overflow / realloc mahal | Leak, dangling, lupa null |
 
-Aturan praktis: butuh akses acak cepat (searching/sorting Modul 1, matrix) → array/vector. Butuh tumbuh-susut dinamis di ujung + insert/delete posisi pointer-diketahui (stack/queue dinamis, chaining hash, adjacency list) → linked list. Di C++ modern, `std::vector` + `std::list`/`std::forward_list` sudah tersedia — tetapi memahami pointer mentah modul ini wajib sebelum memakai STL, agar Anda paham apa yang disembunyikan STL.
+Gunakan larik atau `vector` ketika program membutuhkan akses acak yang cepat, seperti pada pencarian, pengurutan, dan pengolahan matriks. Gunakan senarai berantai ketika data sering bertambah atau berkurang dan program sudah mengetahui posisi simpul yang akan diubah. C++ modern menyediakan `std::list` dan `std::forward_list`, tetapi pemahaman tentang penunjuk tetap diperlukan agar mahasiswa memahami cara kerja struktur tersebut.
 
-### Anatomi pointer yang wajib dikuasai
+### Konsep Penunjuk yang Perlu Dikuasai
 
 - **Stack vs heap:** variabel lokal hidup di call stack (otomatis hilang); `new Node` hidup di heap (awet sampai `delete`). List memakai heap agar node bertahan setelah fungsi insert selesai.
 - **Dangling pointer:** pointer yang menunjuk memori yang sudah di-`delete`. Mengaksesnya = undefined behavior (kadang benar, kadang crash — bug paling sulit didebug).
@@ -73,9 +80,9 @@ Aturan praktis: butuh akses acak cepat (searching/sorting Modul 1, matrix) → a
 4. **Lupa `tail = nullptr`** saat list menjadi kosong → dangling tail.
 5. **Tidak ada destructor** → setiap uji program membocorkan memori; biasakan `valgrind`/sanitizer untuk memeriksa.
 
-## 4. Implementasi Single Linked List (C++)
+## 4. Implementasi Senarai Berantai Tunggal dalam C++
 
-**Tujuan kode:** satu class lengkap yang menjadi template semua modul berikutnya (Stack/Queue berbasis Linked List memakai pola yang sama). Pahami 6 operasi + destructor.
+**Tujuan program:** Program membangun satu kelas senarai berantai tunggal yang memuat enam operasi utama dan sebuah destruktor. Tumpukan dan antrean berbasis senarai berantai menggunakan pola pengelolaan simpul yang sama.
 
 ```cpp
 #include <iostream>
@@ -176,15 +183,15 @@ Setelah hapus depan: 20 -> 25 -> 30 -> NULL
 Setelah hapus belakang: 20 -> 25 -> NULL
 ```
 
-> **Kata sulit = arti mudah:**
-> - *Linked List (senarai berantai)* = gerbong kereta. Tiap gerbong ada barang + sambungan ke gerbong berikut.
-> - *Node* = satu gerbong. *Head* = gerbong paling depan (kepala). *Tail* = gerbong paling belakang (ekor).
-> - *insertFirst / insertLast* = tambah gerbong di depan / belakang. *insertAfter* = selip gerbong sesudah gerbong tertentu.
-> - *deleteFirst / deleteLast* = lepas gerbong depan / belakang.
-> - *Traversal (jalan-jalan)* = lihat semua gerbong satu per satu dari depan sampai habis.
-> - *new / delete* = bikin gerbong baru / bongkar gerbong. Tiap `new` harus ada `delete` biar tidak bocor.
+> **Istilah penting:**
+> - **Senarai berantai (*linked list*)** menghubungkan sejumlah simpul melalui penunjuk.
+> - **Simpul (*node*)** menyimpan data dan penunjuk. **`Head`** menunjuk simpul pertama, sedangkan **`tail`** menunjuk simpul terakhir.
+> - Operasi **`insertFirst`**, **`insertLast`**, dan **`insertAfter`** menyisipkan simpul pada posisi yang ditentukan.
+> - Operasi **`deleteFirst`** dan **`deleteLast`** menghapus simpul pertama atau terakhir.
+> - **Penelusuran (*traversal*)** mengunjungi setiap simpul secara berurutan dari `head`.
+> - Operator **`new`** mengalokasikan memori, sedangkan **`delete`** membebaskan memori yang tidak lagi digunakan.
 
-**Penjelasan per bagian (kalimat pendek):**
+**Penjelasan setiap bagian:**
 
 - **`struct Node { int data; Node* next; }`** — satu simpul = 1 data + 1 pointer ke simpul berikut. `new Node{x, head}` memakai **aggregate initialization**: field pertama = x, kedua = head. Node hidup di **heap** (awet setelah fungsi selesai), tidak seperti variabel lokal stack.
 - **Konstruktor `LinkedList() : head(nullptr)`** — list kosong ditandai `head == nullptr`. Semua operasi mengandalkan konvensi ini, jadi inisialisasi benar adalah separuh kebenaran program.
@@ -196,7 +203,7 @@ Setelah hapus belakang: 20 -> 25 -> NULL
 - **`display`:** pointer jalan `t` dari head sampai `nullptr`, mencetak tiap data. Kondisi `t` ekuivalen `t != nullptr`. Kompleksitas O(n).
 - **Destructor `~LinkedList`:** dipanggil otomatis saat objek keluar scope; menghapus semua node satu per satu. Tanpanya, setiap `new` tanpa `delete` menumpuk → **memory leak**. Inilah RAII paling sederhana di C++.
 
-### Double Linked List (contoh utuh bisa jalan)
+### Senarai Berantai Ganda
 
 **Ide sederhana:** gerbong punya sambungan depan-belakang. Jadi bisa jalan maju dan mundur. Simpan ke `dlist.cpp` lalu jalan.
 
@@ -238,13 +245,13 @@ int main() {
 
 **Cara menjalankan:** `g++ -std=c++17 dlist.cpp -o dlist` lalu `./dlist`. Output: `maju: 10 20 30` dan `mundur: 30 20 10`.
 
-> **Kata sulit = arti mudah:** *prev* = sambungan ke gerbong belakang (sebelumnya). *next* = sambungan ke gerbong depan (sesudahnya).
+> **Istilah penting:** Penunjuk `prev` mengarah ke simpul sebelumnya, sedangkan penunjuk `next` mengarah ke simpul berikutnya.
 
-**Penjelasan (kalimat pendek):** gerbong baru di belakang disambung ke `tail` lama. `prev` gerbong pertama = kosong. Kalau lupa isi `head->prev`, jalan mundur putus.
+**Penjelasan:** Program menghubungkan simpul baru dengan `tail` lama, kemudian memindahkan `tail` ke simpul baru. Penunjuk `prev` pada simpul pertama harus bernilai `nullptr`. Program harus memperbarui `head->prev` setelah penghapusan agar penelusuran mundur tetap valid.
 
-### Circular Linked List (contoh utuh bisa jalan)
+### Senarai Berantai Melingkar
 
-**Ide sederhana:** kereta melingkar. Gerbong terakhir sambung lagi ke gerbong pertama. Cocok untuk main kursi musik. Simpan ke `clist.cpp`.
+**Gagasan utama:** Senarai berantai melingkar menghubungkan simpul terakhir kembali ke simpul pertama. Struktur ini sesuai untuk proses berulang, seperti penjadwalan *round-robin* atau simulasi kursi musik. Simpan contoh program sebagai `clist.cpp`.
 
 ```cpp
 #include <iostream>
@@ -343,13 +350,13 @@ Melayani: Ahmad
 3. Citra
 ```
 
-> **Bahasa mudah:** `datang` = tambah antre di belakang. `layani` = panggil antre paling depan. `tampil` = lihat semua yang masih antre. Simpan `head` (depan) + `tail` (belakang) biar tambah dan layani cepat tanpa jalan dari depan.
+> **Ringkasan operasi:** Fungsi `datang` menambahkan pelanggan di belakang, fungsi `layani` menghapus pelanggan terdepan, dan fungsi `tampil` menampilkan seluruh pelanggan. Penyimpanan `head` dan `tail` memungkinkan operasi penambahan serta pelayanan berjalan dalam O(1).
 
 ## 6. Tugas Praktikum 🧩
 
-> Kumpulkan tiap tugas sebagai **file `.cpp` + screenshot output + analisis di laporan**. Pastikan `g++ -std=c++17` tanpa error dan tanpa memory leak (yakinkan dengan penalaran destructor).
+> Kumpulkan setiap tugas dalam bentuk **berkas `.cpp`, tangkapan layar keluaran, dan analisis dalam laporan**. Pastikan `g++ -std=c++17` dapat mengompilasi program tanpa galat. Jelaskan pula cara destruktor mencegah kebocoran memori.
 
-### 🟢 Level Beginner — *Operasi Fondasi*
+### 🟢 Tingkat Dasar — *Operasi Dasar*
 
 **Tugas B1: `search` + `deleteAfter` + Jejak Pointer (wajib).**
 1. Tambahkan ke class `LinkedList` modul: `Node* search(int x)` (kembalikan pointer node pertama bernilai x, atau `nullptr`) dan `void deleteAfter(Node* prev)` (hapus node setelah prev; jika `prev`/`prev->next` null → tidak melakukan apa-apa).
@@ -363,7 +370,7 @@ Melayani: Ahmad
 3. Jawab di laporan: kompleksitas tiap fungsi + mengapa tampil-mundur rekursi memakai call stack (hubungkan ke Modul 2!).
 *Kriteria nilai:* tiga fungsi benar (60%), uji kasus (20%), analisis + hubungan stack (20%).
 
-### 🟡 Level Medium — *Dua Arah & Melingkar*
+### 🟡 Tingkat Menengah — *Dua Arah dan Melingkar*
 
 **Tugas M1: Double Linked List Riwayat Transaksi.**
 1. Buat class `DList` (struct `DNode{string ket; int nominal; DNode *prev,*next}`) dengan `tambahDepan`, `tambahBelakang`, `hapusDepan`, `hapusBelakang`, `cetakMaju`, `cetakMundur`.
@@ -377,7 +384,7 @@ Melayani: Ahmad
 3. Diskusikan: mengapa studi kasus ini memakai list + tail (O(1)), bukan array geser (O(n))? Kapan array justru lebih baik?
 *Kriteria nilai:* fitur tambahan benar (50%), skenario uji (25%), diskusi list vs array (25%).
 
-### 🔴 Level Expert — *Algoritma & Tanggung Jawab Memori*
+### 🔴 Tingkat Lanjut — *Algoritma dan Tanggung Jawab Memori*
 
 **Tugas E1: Kursi Musik / Josephus + Deteksi Cycle Floyd.**
 1. Buat **Circular Linked List** untuk permainan eliminasi: n pemain melingkar, tiap hitungan ke-k tereliminasi, cetak urutan eliminasi + pemenang. Uji n=7, k=3 (pemenang yang benar = tentukan via program, bukan hafalan!).

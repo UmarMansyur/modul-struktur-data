@@ -1,35 +1,38 @@
-# Modul 1: Searching & Sorting
+# Modul 1: Pencarian dan Pengurutan
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 0
 
-> **Cara menjalankan semua kode di modul ini:**
-> Semua contoh (Linear, Binary, Bubble, Selection, Insertion, Quick, Studi Kasus) sudah lengkap dengan `main`. Caranya sama: simpan ke `cari.cpp`, lalu `g++ -std=c++17 cari.cpp -o cari` lalu `./cari`. Lihat output di bawah tiap kode untuk cek benar atau tidak.
+> **Panduan menjalankan program:**
+> 1. Salin satu contoh program secara utuh ke dalam berkas `.cpp`, misalnya `cari.cpp`.
+> 2. Kompilasi program dengan perintah `g++ -std=c++17 cari.cpp -o cari`.
+> 3. Jalankan program dengan perintah `./cari` pada Linux/macOS atau `.\cari.exe` pada Windows.
+> 4. Bandingkan keluaran program dengan contoh keluaran pada bagian terkait.
 >
-> **Kata sulit = arti mudah:**
-> - *Searching (mencari)* = cari nama di daftar hadir.
-> - *Sorting (mengurutkan)* = rapikan kartu dari kecil ke besar.
-> - *Linear Search (cari satu-satu)* = cek dari awal sampai ketemu.
-> - *Binary Search (cari belah dua)* = data harus urut dulu, lalu tebak tengah terus.
-> - *Stabil* = yang nilainya sama, urutan awalnya tidak dibalik.
+> **Istilah penting:**
+> - **Pencarian (*searching*)** merupakan proses menemukan data tertentu dalam sekumpulan data.
+> - **Pengurutan (*sorting*)** merupakan proses menyusun data berdasarkan kriteria tertentu.
+> - **Pencarian linear (*linear search*)** memeriksa elemen secara berurutan dari awal.
+> - **Pencarian biner (*binary search*)** membagi ruang pencarian menjadi dua dan mensyaratkan data yang sudah terurut.
+> - Algoritma pengurutan disebut **stabil** apabila elemen yang bernilai sama tetap mempertahankan urutan relatifnya.
 
 ## 1. Capaian Pembelajaran
 
 Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-1. Menjelaskan dan mengimplementasikan Linear Search dan Binary Search.
-2. Menjelaskan dan mengimplementasikan Bubble, Selection, Insertion Sort serta prinsip Quick & Merge Sort.
+1. Menjelaskan dan mengimplementasikan pencarian linear serta pencarian biner.
+2. Menjelaskan dan mengimplementasikan *Bubble Sort*, *Selection Sort*, dan *Insertion Sort*, serta menjelaskan prinsip *Quick Sort* dan *Merge Sort*.
 3. Menganalisis kompleksitas masing-masing algoritma.
-4. Menyelesaikan studi kasus pengurutan & pencarian data mahasiswa berbasis Array of Struct.
+4. Menyelesaikan studi kasus pengurutan dan pencarian data mahasiswa berbasis larik berisi `struct`.
 
-## 2. Searching (Pencarian)
+## 2. Pencarian (*Searching*)
 
-Pencarian adalah aktivitas paling manusiawi dalam komputasi: dari mencari nama di daftar hadir, mencari buku di perpustakaan, hingga mencari satu baris data di antara jutaan baris database. Setiap kali kita mengetik di kolom pencarian Google, sesungguhnya sebuah algoritma searching sedang bekerja di balik layar. Karena itu memahami searching bukan sekadar menghafal kode, melainkan memahami strategi menemukan sesuatu secara efisien — dan strategi yang tepat selalu bergantung pada kondisi datanya.
+Pencarian merupakan proses untuk menemukan data tertentu dalam sekumpulan data. Proses ini muncul ketika program mencari nama dalam daftar hadir, buku dalam katalog perpustakaan, atau baris tertentu dalam basis data. Pemilihan algoritma pencarian bergantung pada jumlah data, susunan data, dan frekuensi pencarian.
 
-Ada dua pendekatan pencarian yang akan kita pelajari. Yang pertama adalah Linear Search, si pekerja jujur yang memeriksa satu per satu dari awal sampai akhir tanpa melewatkan apa pun. Ia tidak menuntut data yang rapi, tetapi ia lambat ketika data membesar. Yang kedua adalah Binary Search, si ahli strategi yang membelah masalah menjadi dua di setiap langkah dan membuang separuh yang tidak mungkin — tetapi ia menuntut satu syarat mutlak: data harus sudah terurut. Perbandingan keduanya mengajarkan pelajaran hidup yang dalam, yang akan kita renungkan di akhir bab ini.
+Modul ini membahas dua pendekatan pencarian. Pencarian linear memeriksa setiap elemen dari awal sampai akhir dan tidak mensyaratkan data yang terurut. Pencarian biner mengurangi ruang pencarian menjadi setengah pada setiap langkah, tetapi hanya dapat bekerja dengan benar pada data yang sudah terurut.
 
-### 2.1 Linear Search – O(n)
+### 2.1 Pencarian Linear – O(n)
 
-Linear Search adalah algoritma pencarian yang paling natural karena persis seperti cara manusia mencari kunci yang hilang di dalam tas: keluarkan satu per satu, periksa, jika bukan lanjutkan ke barang berikutnya. Ia tidak membutuhkan persiapan apa pun — data boleh acak, boleh belum diurutkan, boleh dalam kondisi apa pun. Kelebihan inilah yang membuatnya tetap relevan: untuk data kecil atau pencarian yang hanya dilakukan sekali, biaya mengurutkan data terlebih dahulu justru lebih mahal daripada mencarinya secara linear.
+Pencarian linear memeriksa setiap elemen secara berurutan sampai algoritma menemukan target atau mencapai akhir data. Algoritma ini dapat bekerja pada data yang belum terurut. Pencarian linear sesuai untuk data berukuran kecil atau pencarian yang hanya dilakukan sesekali karena biaya pengurutan awal dapat lebih besar daripada biaya pencarian itu sendiri.
 
 Perhatikan kodenya yang sangat pendek di bawah ini. Fungsi menerima tiga hal: array `arr`, ukurannya `n`, dan target `x`. Perlu dicatat bahwa parameter `int arr[]` sebenarnya diterima compiler sebagai pointer (`int*`), sehingga `sizeof(arr)` di dalam fungsi tidak akan memberi ukuran array yang sebenarnya — inilah alasan mengapa ukuran `n` harus dilewatkan secara eksplisit, dan ini adalah jebakan klasik yang wajib diingat. Loop berjalan dari indeks 0 hingga n−1, membandingkan setiap elemen dengan target; begitu ditemukan yang sama, fungsinya langsung mengembalikan indeks tersebut tanpa memeriksa sisanya. Pengembalian dini inilah yang membuat kasus terbaiknya O(1) — ketika target ternyata ada di posisi pertama. Namun jika loop selesai tanpa satu pun yang cocok, fungsi mengembalikan −1 sebagai konvensi universal "tidak ditemukan", karena indeks valid tidak pernah negatif.
 
@@ -69,9 +72,11 @@ Mencari 9 secara linear:
 => 9 ditemukan di indeks 2
 ```
 
-### 2.2 Binary Search – O(log n) ⚠️ data HARUS terurut
+### 2.2 Pencarian Biner – O(log n)
 
-Jika Linear Search adalah pekerja keras, maka Binary Search adalah ahli strategi. Bayangkan permainan tebak angka 1 sampai 100: pemain buruk menebak 1, 2, 3 satu per satu, sedangkan pemain cerdas selalu menebak angka tengah — jika jawabannya "lebih besar", ia membuang seluruh separuh bawah sekaligus. Dengan strategi ini, menebak di antara satu juta angka pun hanya butuh sekitar 20 tebakan, karena 2²⁰ ≈ 1.000.000. Inilah keajaiban logaritmik: setiap langkah memangkas separuh ruang masalah, sehingga waktu tumbuh sangat lambat meski data membesar pesat.
+> **Prasyarat:** pencarian biner hanya menghasilkan jawaban yang benar apabila data sudah terurut berdasarkan kunci pencarian.
+
+Pencarian biner membandingkan target dengan elemen tengah, kemudian mengabaikan separuh data yang tidak mungkin memuat target. Sebagai ilustrasi, algoritma hanya membutuhkan sekitar 20 langkah untuk menelusuri satu juta elemen karena 2²⁰ mendekati 1.000.000. Proses pembagian tersebut menghasilkan kompleksitas waktu O(log n).
 
 Syarat mutlaknya hanya satu tetapi tidak bisa ditawar: data harus sudah terurut menaik. Tanpa keterurutan, keputusan "buang separuh kiri" tidak memiliki dasar kebenaran sama sekali. Perhatikan implementasi iteratifnya di bawah ini. Dua variabel `l` (low) dan `r` (right) menandai batas inklusif area yang masih mungkin mengandung target; selama `l <= r` berarti masih ada elemen tersisa untuk diperiksa. Titik tengah dihitung dengan rumus `l + (r - l) / 2` dan bukan `(l + r) / 2` — penulisan ini disengaja untuk mencegah integer overflow ketika `l + r` melampaui batas tipe int, sebuah bug nyata yang pernah bertahun-tahun bersembunyi di library standar populer. Setiap iterasi hanya punya tiga kemungkinan: tepat sama (ketemu, kembalikan), nilai tengah lebih kecil (target pasti di kanan, geser `l`), atau sebaliknya (geser `r`). Karena array terurut, pembuangan separuh ini dijamin aman dan tidak akan pernah membuang target yang sebenarnya ada.
 
@@ -121,19 +126,19 @@ Mencari 7 secara biner:
 
 > **Renungan filosofis searching:** Linear Search mengajarkan *kejujuran proses* — tidak ada jalan pintas, setiap elemen diperiksa dengan adil tanpa prasangka, tetapi kesabaran itu mahal harganya. Binary Search mengajarkan *pentingnya persiapan* — ia hanya bisa berlari kencang karena seseorang telah bersusah payah mengurutkan data sebelumnya; kecepatan hari ini selalu dibayar oleh kedisiplinan kemarin. Dalam hidup pun demikian: orang yang terlihat "instan menemukan jawaban" biasanya telah lama merapikan pengetahuannya, sedangkan yang datanya (hidupnya) masih berantakan mau tidak mau harus menelusuri satu per satu dengan sabar.
 
-## 3. Sorting (Pengurutan)
+## 3. Pengurutan (*Sorting*)
 
-Jika searching adalah seni menemukan, maka sorting adalah seni merapikan. Manusia secara naluriah menyukai keteraturan: kartu di tangan diurutkan dari kecil ke besar, buku di rak disusun alfabetis, antrean diaturตาม nomor. Komputer pun demikian — data yang terurut tidak hanya enak dipandang, tetapi membuka pintu bagi algoritma cepat seperti Binary Search. Tanpa sorting, Binary Search lumpuh; tanpa keteraturan, strategi terbaik pun tidak bisa berjalan. Maka mempelajari sorting berarti mempelajari cara menciptakan ketertiban dari kekacauan, langkah demi langkah.
+Pengurutan menyusun data berdasarkan kriteria tertentu, misalnya nilai dari kecil ke besar atau nama secara alfabetis. Data yang terurut memudahkan penyajian informasi dan memungkinkan penggunaan algoritma yang lebih cepat, seperti pencarian biner. Oleh karena itu, mahasiswa perlu memahami proses, biaya, dan karakteristik setiap algoritma pengurutan.
 
 Tabel berikut merangkum lima algoritma yang akan kita bedah. Tiga yang pertama (Bubble, Selection, Insertion) berkompleksitas kuadratik — lambat untuk data besar tetapi sempurna sebagai laboratorium pemahaman karena logikanya transparan. Dua yang terakhir (Quick, Merge) berkompleksitas n log n — jauh lebih cepat dan dipakai di dunia nyata, tetapi mekanismenya (rekursi, partisi, penggabungan) menuntut abstraksi yang lebih tinggi. Kata "stabil" pada tabel berarti algoritma tidak akan menukar urutan relatif dua elemen yang nilainya sama — sifat penting ketika mengurutkan struct, misalnya dua mahasiswa ber-IPK sama harus tetap dalam urutan NIM semula.
 
-| Algoritma | Best | Average | Worst | Stabil | Ide 1 kalimat |
+| Algoritma | Kasus terbaik | Kasus rata-rata | Kasus terburuk | Stabil | Gagasan utama |
 |---|---|---|---|---|---|
-| Bubble Sort | O(n) | O(n²) | O(n²) | Ya | Gelembungkan terbesar ke kanan tiap pass |
-| Selection Sort | O(n²) | O(n²) | O(n²) | Tidak | Pilih minimum, taruh di depan |
-| Insertion Sort | O(n) | O(n²) | O(n²) | Ya | Sisipkan kartu ke tangan yang sudah urut |
-| Quick Sort | O(n log n) | O(n log n) | O(n²) | Tidak | Partisi sekitar pivot, rekursi |
-| Merge Sort | O(n log n) | O(n log n) | O(n log n) | Ya | Belah dua, urutkan, gabung |
+| Bubble Sort | O(n) | O(n²) | O(n²) | Ya | Memindahkan elemen terbesar ke kanan pada setiap putaran |
+| Selection Sort | O(n²) | O(n²) | O(n²) | Tidak | Memilih elemen minimum dan menempatkannya di depan |
+| Insertion Sort | O(n) | O(n²) | O(n²) | Ya | Menyisipkan elemen ke bagian yang sudah terurut |
+| Quick Sort | O(n log n) | O(n log n) | O(n²) | Tidak | Membagi data berdasarkan pivot secara rekursif |
+| Merge Sort | O(n log n) | O(n log n) | O(n log n) | Ya | Membagi, mengurutkan, lalu menggabungkan data |
 
 ### 3.1 Bubble Sort
 
@@ -182,7 +187,7 @@ pass 3: 1 2 4 5 (rapi, berhenti)
 Akhir: 1 2 4 5
 ```
 
-### 3.2 Selection & Insertion Sort
+### 3.2 *Selection Sort* dan *Insertion Sort*
 
 Selection Sort menganut filosofi yang berbeda: alih-alih menukar berkali-kali seperti Bubble, ia memilih dengan tenang lalu menukar tepat satu kali per iterasi. Array dibagi menjadi zona kiri yang sudah urut dan zona kanan yang belum; setiap iterasi memindai seluruh zona kanan untuk menemukan nilai minimum, mencatat posisinya di `minIdx`, dan hanya di akhir melakukan satu `swap` ke ujung kiri zona kanan. Kelebihannya adalah jumlah pertukaran yang minimal (maksimal n−1 kali) sehingga cocok ketika operasi swap mahal — misalnya memindahkan record besar di memori. Namun pemindaian penuh di setiap iterasi membuatnya selalu O(n²) dalam semua kasus, dan lompatan swap jarak jauh dapat melompati elemen yang nilainya sama sehingga algoritma ini tidak stabil.
 
@@ -247,7 +252,7 @@ sisipkan 2: 1 2 4 5
 Hasil: 1 2 4 5
 ```
 
-### 3.3 Quick Sort & Merge Sort (pengenalan)
+### 3.3 Pengenalan *Quick Sort* dan *Merge Sort*
 
 Dua algoritma sebelumnya bekerja dengan cara yang sabar tetapi lambat, sedangkan Quick Sort dan Merge Sort bekerja dengan cara yang cerdas: *divide and conquer* — pecah masalah besar menjadi potongan-potongan kecil, selesaikan setiap potongan, lalu gabungkan kembali. Quick Sort memilih seorang *pivot* sebagai pembatas, mempartisi array sehingga yang lebih kecil dari pivot berkumpul di kiri dan yang lebih besar di kanan, kemudian secara rekursif mengurutkan kedua sisi. Karena pivot telah berada di posisi finalnya, masalah menyusut dengan cepat dan rata-rata kompleksitasnya O(n log n) dengan keunggulan praktis berupa pengurutan di tempat (in-place) yang ramah cache.
 
@@ -303,7 +308,7 @@ Akhir: 1 2 3 5 6
 
 > **Renungan filosofis sorting:** Bubble Sort mengajarkan *ketekunan* — perbaikan kecil yang dilakukan berulang-ulang pada akhirnya merapikan segalanya, seperti kebiasaan baik yang dibangun hari demi hari. Selection Sort mengajarkan *kebijaksanaan memilih* — jangan menukar sebelum yakin menemukan yang terbaik, tetapi ingat bahwa terlalu lama memilih juga memakan waktu kuadratik. Insertion Sort mengajarkan *menemukan tempat yang tepat* — setiap elemen punya posisi di mana ia seharusnya berada, dan tugas kita adalah menggeser yang lain dengan hormat untuk memberinya ruang. Sedangkan Quick dan Merge Sort mengajarkan *manajemen masalah besar* — jangan hadapi raksasa sekaligus, pecahlah menjadi bagian-bagian kecil yang bisa ditaklukkan satu per satu. Keteraturan, pada akhirnya, bukanlah bakat melainkan hasil dari strategi yang dijalankan dengan disiplin.
 
-## 4. Studi Kasus: Data Mahasiswa (Array of Struct)
+## 4. Studi Kasus: Data Mahasiswa dalam Larik `struct`
 
 Kini seluruh teori diuji dalam satu skenario nyata yang terdiri dari dua fase. Fase pertama adalah menampilkan *ranking* mahasiswa berdasarkan IPK secara menurun dengan Insertion Sort — wajar dipilih karena data mahasiswa berjumlah kecil dan algoritmanya stabil. Fase kedua adalah menyiapkan data agar bisa dicari cepat dengan Binary Search berdasarkan NIM memakai Bubble Sort menaik — langkah ini hukumnya wajib karena Binary Search hanya sah pada kunci yang terurut, dan mengurutkan berdasarkan IPK tidak membantu pencarian berdasarkan NIM sama sekali. Poin terpenting yang harus dipahami: setiap operasi `swap` di sini memindahkan satu struct utuh (NIM, nama, dan IPK ikut berpindah bersama), sehingga identitas setiap mahasiswa tidak pernah tercerai-berai.
 
@@ -378,9 +383,9 @@ Cari NIM 230103 => indeks 2 (Citra)
 
 ## 5. Tugas Praktikum 🧩
 
-> Kerjakan sesuai level. Setiap tugas wajib dikumpulkan sebagai **satu file `.cpp` + screenshot output + analisis singkat di laporan**. Kode yang tidak bisa dicompile otomatis bernilai nol — pastikan `g++ -std=c++17` lolos tanpa error.
+> Kerjakan tugas sesuai tingkat kesulitan yang ditentukan. Kumpulkan setiap tugas dalam bentuk **satu berkas `.cpp`, tangkapan layar keluaran, dan analisis singkat dalam laporan**. Pastikan perintah `g++ -std=c++17` dapat mengompilasi program tanpa galat.
 
-### 🟢 Level Beginner — *Memahami Gerakan Dasar*
+### 🟢 Tingkat Dasar — *Memahami Langkah Dasar*
 
 **Tugas B1: Jejak Linear Search (wajib semua mahasiswa).**
 1. Salin fungsi `linearSearch` versi modul (yang mencetak setiap cek).
@@ -397,7 +402,7 @@ Cari NIM 230103 => indeks 2 (Citra)
 
 *Kriteria nilai:* output benar (50%), penandaan final tepat (25%), penjelasan `swapped` benar (25%).
 
-### 🟡 Level Medium — *Memodifikasi & Membandingkan*
+### 🟡 Tingkat Menengah — *Memodifikasi dan Membandingkan*
 
 **Tugas M1: Binary Search Rekursif + Bukti Syarat Terurut.**
 1. Tulis ulang `binarySearch` secara **rekursif** (basis: `l > r` → −1).
@@ -413,7 +418,7 @@ Cari NIM 230103 => indeks 2 (Citra)
 
 *Kriteria nilai:* struct + dua sort jalan (40%), counter akurat (30%), analisis stabilitas + tabel (30%).
 
-### 🔴 Level Expert — *Menganalisis & Merancang*
+### 🔴 Tingkat Lanjut — *Menganalisis dan Merancang*
 
 **Tugas E1: Benchmark Empiris (tabel waktu eksekusi).**
 1. Bangkitkan array acak berukuran n = 1.000, 10.000, dan 50.000 (`rand()` dengan seed tetap agar reproduksibel).

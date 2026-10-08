@@ -1,42 +1,44 @@
-# Modul 0: Pendahuluan & Review Bahasa C++
+# Modul 0: Pendahuluan dan Tinjauan Ulang Bahasa C++
 
 > **Mata Kuliah:** Struktur Data | **Program Studi:** Teknik Informatika – UNIRA
 > **Durasi:** 2 × 100 menit | **Prasyarat:** Dasar Pemrograman
 
-> **Cara menjalankan semua kode di modul ini (baca dulu, 1 menit):**
-> 1. Copy satu blok kode utuh (dari `#include` sampai `return 0`) ke file, mis. `kartu.cpp`.
-> 2. Buka terminal di folder itu, ketik `g++ -std=c++17 kartu.cpp -o kartu` lalu `./kartu` (di Windows `.\kartu.exe`).
-> 3. Semua kode di modul ini sudah lengkap dengan `main` + contoh output, jadi tinggal copy-paste-jalan.
+> **Panduan menjalankan program:**
+> 1. Salin satu blok kode secara utuh, mulai dari `#include` sampai `return 0`, ke dalam berkas, misalnya `kartu.cpp`.
+> 2. Buka terminal pada direktori penyimpanan berkas tersebut.
+> 3. Kompilasi program dengan perintah `g++ -std=c++17 kartu.cpp -o kartu`.
+> 4. Jalankan program dengan perintah `./kartu` pada Linux/macOS atau `.\kartu.exe` pada Windows.
+> 5. Bandingkan keluaran program dengan contoh keluaran yang tersedia pada setiap bagian.
 >
-> **Kata sulit = arti mudah di modul ini:**
-> - *Time complexity (kecepatan tumbuh)* = kalau data tambah banyak, waktu ikut tambah seberapa cepat.
-> - *Space complexity (memori tambahan)* = butuh tempat ekstra seberapa banyak.
-> - *Pointer (`*`, alamat)* = kertas berisi alamat rumah. *Reference (`&`, nama kedua)* = nama panggilan rumah yang sama.
+> **Istilah penting:**
+> - **Kompleksitas waktu (*time complexity*)** menjelaskan laju pertambahan waktu eksekusi ketika jumlah data bertambah.
+> - **Kompleksitas ruang (*space complexity*)** menjelaskan jumlah memori tambahan yang dibutuhkan oleh algoritma.
+> - **Penunjuk (*pointer*)** menyimpan alamat memori, sedangkan **referensi (*reference*)** menjadi nama lain bagi variabel yang sama.
 
 ## 1. Capaian Pembelajaran
 
 Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-1. Menjelaskan pengertian struktur data dan efisiensi algoritma (Time/Space Complexity).
+1. Menjelaskan pengertian struktur data serta kompleksitas waktu dan ruang.
 2. Menggunakan variabel, tipe data primitif, konstanta, dan kontrol alur di C++.
-3. Menggunakan pointer (`*`) dan reference (`&`) serta menjelaskan model memorinya.
-4. Menggunakan array 1D/2D, `struct`, dan array of struct sebagai struktur data primitif.
+3. Menggunakan penunjuk (*pointer*) dan referensi (*reference*) serta menjelaskan hubungan keduanya dengan memori.
+4. Menggunakan larik satu dimensi, larik dua dimensi, `struct`, dan larik berisi `struct` sebagai struktur data dasar.
 
 ## 2. Konsep Dasar Struktur Data
 
-**Struktur data** adalah cara mengorganisasi dan menyimpan data agar dapat diakses dan dimodifikasi secara efisien. Bayangkan perpustakaan: buku yang ditumpuk sembarangan tetap bisa ditemukan, tapi butuh waktu lama. Buku yang disusun berdasarkan kategori, rak, dan kode — itulah struktur data — membuat pencarian jauh lebih cepat. Dalam pemrograman, pilihan struktur data menentukan apakah program berjalan dalam sekejap atau menunggu berjam-jam.
+**Struktur data** merupakan cara untuk mengatur dan menyimpan data agar program dapat mengakses serta mengubah data secara efisien. Sebagai contoh, petugas perpustakaan dapat menemukan buku lebih cepat ketika ia menyusun buku berdasarkan kategori, rak, dan kode. Dalam pemrograman, pemilihan struktur data juga memengaruhi kecepatan eksekusi dan penggunaan memori.
 
-Efisiensi itu sendiri diukur dengan dua meteran. Meteran pertama adalah **time complexity**, yaitu seberapa cepat waktu eksekusi tumbuh ketika jumlah data (n) membesar. Meteran kedua adalah **space complexity**, yaitu seberapa banyak memori tambahan yang dibutuhkan algoritma di luar memori inputnya. Seorang insinyur perangkat lunak yang baik selalu menimbang keduanya sebelum memilih algoritma.
+Programmer biasanya mengukur efisiensi algoritma melalui dua aspek. **Kompleksitas waktu** menunjukkan laju pertambahan waktu eksekusi ketika jumlah data (`n`) meningkat. **Kompleksitas ruang** menunjukkan jumlah memori tambahan yang digunakan algoritma di luar memori untuk data masukan. Programmer perlu mempertimbangkan kedua aspek tersebut sebelum memilih algoritma.
 
 | Notasi | Nama | Artinya secara intuitif | Contoh |
 |---|---|---|---|
 | O(1) | Konstan | Waktu tetap, tidak peduli n | Akses `arr[i]` |
-| O(log n) | Logaritmik | Setiap langkah membuang separuh data | Binary Search |
-| O(n) | Linear | Waktu tumbuh sebanding n | Traversal array |
-| O(n log n) | Linearitmik | n dikali log n | Merge Sort |
-| O(n²) | Kuadratik | Loop bersarang 2 level | Bubble Sort |
+| O(log n) | Logaritmik | Setiap langkah mengurangi separuh ruang pencarian | Pencarian biner |
+| O(n) | Linear | Waktu bertambah sebanding dengan `n` | Penelusuran larik |
+| O(n log n) | Linearitmik | Waktu bertambah sebanding dengan `n log n` | *Merge Sort* |
+| O(n²) | Kuadratik | Algoritma memakai dua perulangan bersarang | *Bubble Sort* |
 
-Sebagai gambaran, Bubble Sort hanya butuh satu variabel bantu sehingga space complexity-nya O(1), sedangkan Merge Sort membutuhkan array bantu sebesar n sehingga space complexity-nya O(n). Perbedaan ini akan terasa nyata ketika data berjumlah jutaan baris.
+Sebagai perbandingan, *Bubble Sort* hanya membutuhkan satu variabel bantu sehingga kompleksitas ruangnya O(1). *Merge Sort* membutuhkan larik bantu berukuran `n` sehingga kompleksitas ruangnya O(n). Perbedaan kebutuhan memori tersebut akan semakin terasa ketika program mengolah jutaan data.
 
 ![Pointer bekerja: variabel, address, dereference](https://www.programiz.com/sites/tutorial2program/files/cpp-pointer-working_0.png)
 *Gambar 1. Cara kerja pointer: `var`, `&var` (address), `*p` (dereference). Sumber: Programiz.*
@@ -46,11 +48,11 @@ Sebagai gambaran, Bubble Sort hanya butuh satu variabel bantu sehingga space com
 
 ## 3. Dasar C++
 
-### 3.1 Variabel, Tipe Data & Konstanta
+### 3.1 Variabel, Tipe Data, dan Konstanta
 
-Mari kita mulai dari fondasi paling dasar: variabel. Setiap data dalam program harus tinggal di suatu tempat di memori, dan variabel adalah nama yang kita berikan untuk tempat itu. Bahasa C++ adalah bahasa yang *statically typed*, artinya setiap variabel harus dideklarasikan tipenya sejak awal dan tipe itu tidak bisa berubah. Ketegasan ini justru menjadi kekuatan C++, karena compiler bisa menangkap banyak kesalahan sejak sebelum program dijalankan, sekaligus mengatur memori secara presisi.
+Variabel menjadi dasar penyimpanan data dalam program. Setiap variabel memberikan nama pada suatu lokasi di memori. C++ merupakan bahasa dengan tipe statis (*statically typed*), sehingga programmer harus menentukan tipe setiap variabel saat deklarasi. Setelah deklarasi, tipe variabel tersebut tidak dapat berubah. Aturan ini membantu kompilator menemukan kesalahan sebelum program berjalan dan mengatur penggunaan memori secara tepat.
 
-Perhatikan kode di bawah ini. Di sana kita mendeklarasikan lima jenis data yang akan menjadi bahan utama seluruh modul praktikum: `int` untuk NIM, `float` untuk IPK, `char` untuk grade, `bool` untuk status kelulusan, dan `string` untuk nama. Kata kunci `const` pada `PI` menandakan nilai yang dikunci — ia tidak boleh diubah setelah inisialisasi, sehingga cocok untuk konstanta matematika atau batas ukuran array. Jika ada baris `PI = 3.0;` di bawahnya, compiler akan langsung protes dengan error. Akhirnya program mencetak identitas mahasiswa tersebut ke layar sebagai bukti bahwa semua variabel terisi dengan benar.
+Program berikut mendeklarasikan lima tipe data yang sering digunakan dalam praktikum. Program memakai `int` untuk NIM, `float` untuk IPK, `char` untuk nilai huruf, `bool` untuk status kelulusan, dan `string` untuk nama. Kata kunci `const` pada `PI` menetapkan nilai yang tidak dapat diubah setelah inisialisasi. Oleh karena itu, `const` sesuai untuk konstanta matematika atau batas ukuran larik. Kompilator akan menghasilkan galat apabila program mencoba menjalankan pernyataan seperti `PI = 3.0;`.
 
 ```cpp
 #include <iostream>
@@ -75,7 +77,7 @@ int main() {
 }
 ```
 
-Ada beberapa detail kecil yang sering menjebak pemula tetapi penting dipahami. Huruf `f` pada `3.75f` menegaskan bahwa literal itu bertipe float, karena tanpa `f` compiler menganggapnya `double`. Kemudian `char` wajib memakai kutip satu, sebab kutip dua seperti `"A"` berarti string yang diakhiri karakter null — dua tipe yang sama sekali berbeda. Terakhir, baris `#include <iostream>` memuat library input-output agar `cout` tersedia, sedangkan `using namespace std;` hanyalah jalan pintas agar kita tidak perlu menulis `std::cout` berulang-ulang.
+Mahasiswa perlu memperhatikan beberapa detail pada program tersebut. Huruf `f` pada `3.75f` menegaskan bahwa literal itu bertipe `float`; tanpa huruf tersebut, kompilator akan menganggapnya sebagai `double`. Tipe `char` menggunakan tanda petik tunggal, seperti `'A'`, sedangkan `"A"` merupakan literal string. Baris `#include <iostream>` memuat pustaka masukan dan keluaran agar program dapat memakai `cout`. Pernyataan `using namespace std;` memungkinkan program menulis `cout` tanpa awalan `std::`.
 
 **Output program:**
 
@@ -88,11 +90,11 @@ Grade : A
 Lulus : Ya
 ```
 
-> **Kesalahan umum:** lupa `f` pada float (masih jalan tapi warning), menukar `'A'` dengan `"A"`, dan mencoba mengubah variabel `const` sehingga compile error.
+> **Kesalahan umum:** programmer melupakan akhiran `f` pada literal `float`, menukar `'A'` dengan `"A"`, atau mencoba mengubah nilai variabel `const`. Kesalahan tersebut dapat menghasilkan peringatan atau galat saat kompilasi.
 
-### 3.2 Kontrol Alur (Selection & Looping)
+### 3.2 Kontrol Alur: Percabangan dan Perulangan
 
-Program yang berguna hampir selalu harus bisa mengambil keputusan dan mengulang pekerjaan. Tanpa kemampuan bercabang, program hanya bisa berjalan lurus dari atas ke bawah; tanpa perulangan, kita harus menulis ribuan baris untuk tugas yang berulang. Kedua kemampuan inilah yang menjadi mesin utama semua algoritma struktur data: searching mengulang perbandingan, sorting mengulang pertukaran, dan traversal mengulang kunjungan ke setiap elemen.
+Program menggunakan percabangan untuk mengambil keputusan dan menggunakan perulangan untuk mengerjakan langkah yang sama secara berulang. Kedua mekanisme tersebut menjadi dasar berbagai algoritma struktur data. Algoritma pencarian mengulang proses perbandingan, algoritma pengurutan mengulang proses pertukaran, dan algoritma penelusuran mengunjungi setiap elemen secara sistematis.
 
 Kode berikut memperagakan tiga pola kontrol yang akan muncul terus-menerus di modul-modul berikutnya. Blok `if-else if-else` menentukan grade dari IPK dengan cara mengevaluasi kondisi dari atas ke bawah — kondisi pertama yang benar langsung dieksekusi dan sisanya dilewati. Karena itu urutan sangat penting: jika `ipk >= 3.0` ditulis sebelum `ipk >= 3.5`, maka IPK 3.8 pun akan terjebak di grade B. Selanjutnya blok `switch` memilih pesan berdasarkan nilai grade secara persis, di mana setiap `case` wajib diakhiri `break` agar tidak terjadi *fall-through* ke case berikutnya. Terakhir, tiga jenis loop diperagakan: `for` untuk jumlah iterasi yang sudah diketahui, `while` untuk iterasi berbasis kondisi yang dicek di awal, dan `do-while` yang kondisinya dicek di akhir sehingga badannya minimal berjalan satu kali.
 
@@ -147,9 +149,9 @@ while : 0 1 2 3 4 (j berakhir = 5)
 do-while: 5 4 3 2 1 (j berakhir = 0)
 ```
 
-### 3.3 Pointer & Reference
+### 3.3 Penunjuk (*Pointer*) dan Referensi (*Reference*)
 
-Inilah bagian terpenting sekaligus paling ditakuti dalam review C++: pointer dan reference. Keduanya adalah fondasi dari hampir seluruh struktur data dinamis — Linked List, Tree, dan Graph semuanya dibangun dari pointer yang saling menunjuk. Intuisi kuncinya sederhana: variabel biasa menyimpan *nilai*, pointer menyimpan *alamat* tempat nilai itu tinggal, sedangkan reference adalah *nama kedua* (alias) untuk variabel yang sudah ada. Operator `&` berarti "alamat dari", sedangkan `*` berarti "nilai yang ditunjuk" (dereference). Perhatikan bahwa `*` memiliki dua peran yang berbeda konteks: saat deklarasi (`int* p`) ia berarti "pointer", sedangkan saat dipakai (`*p`) ia berarti "isi yang ditunjuk".
+Penunjuk dan referensi menjadi dasar bagi sebagian besar struktur data dinamis. Senarai berantai, pohon, dan graf menggunakan penunjuk untuk menghubungkan satu elemen dengan elemen lain. Variabel biasa menyimpan nilai, sedangkan penunjuk menyimpan alamat lokasi nilai tersebut. Referensi menjadi nama lain atau alias bagi variabel yang sudah ada. Operator `&` mengambil alamat suatu variabel, sedangkan operator `*` mengakses nilai pada alamat yang ditunjuk. Dalam deklarasi `int* p`, simbol `*` menyatakan bahwa `p` merupakan penunjuk. Dalam ekspresi `*p`, simbol yang sama melakukan dereferensi terhadap `p`.
 
 Program di bawah ini membuktikan hubungan tersebut secara empiris. Misalkan sistem operasi menaruh variabel `x` di alamat `0x1000` berisi nilai 10. Baris `int* p = &x` mengisi pointer `p` dengan alamat itu, sehingga `p` dan `&x` mencetak nilai yang sama persis. Baris `int& r = x` menciptakan alias `r` yang tidak memiliki memori sendiri — `r` dan `x` adalah dua nama untuk sel `0x1000` yang sama. Ketika program menjalankan `*p = 20`, ia menulis angka 20 ke alamat yang ditunjuk `p`, sehingga `x` ikut berubah karena `x` memang tinggal di sana. Ketika program menjalankan `r = 30`, itu identik dengan menulis `x = 30` karena keduanya menunjuk sel yang sama. Perbedaan kunci yang harus diingat: pointer bisa bernilai `nullptr` dan bisa dipindahkan menunjuk variabel lain (`p = &y`), sedangkan reference wajib langsung diinisialisasi, tidak bisa null, dan menempel permanen pada variabel pertamanya.
 
@@ -198,9 +200,9 @@ Cek silang: *p = 30, r = 30
 
 > **Kesalahan umum:** mendereference pointer yang belum diinisialisasi (`int* p; *p = 5;` → crash), serta lupa `delete` untuk setiap `new` sehingga terjadi memory leak (dibahas di Modul 4).
 
-### 3.4 Array, Struct & Array of Struct
+### 3.4 Larik, `struct`, dan Larik Berisi `struct`
 
-Setelah memahami variabel tunggal dan pointer, kini saatnya menyimpan banyak data sekaligus. Array adalah deretan elemen sejenis yang tersimpan *berurutan* di memori, sehingga akses ke elemen ke-i dapat dihitung langsung dengan rumus `alamat_awal + i × ukuran_elemen` — inilah alasan akses array selalu O(1). Namun array hanya bisa menampung satu tipe data, padahal data dunia nyata selalu majemuk: seorang mahasiswa memiliki NIM (string), nama (string), dan IPK (float) sekaligus. Di sinilah `struct` berperan sebagai pembungkus yang menggabungkan beberapa field berbeda tipe menjadi satu kesatuan, dan gabungan keduanya — array of struct — menjadi pola data utama yang akan dipakai di Modul 1 untuk data mahasiswa dan barang.
+Larik (*array*) menyimpan sekumpulan elemen dengan tipe yang sama secara berurutan di memori. Program dapat menghitung alamat elemen ke-`i` dengan rumus `alamat_awal + i × ukuran_elemen`. Oleh karena itu, program dapat mengakses elemen larik dalam kompleksitas O(1). Namun, satu larik hanya dapat menampung satu tipe data. `struct` mengatasi keterbatasan tersebut dengan menggabungkan beberapa bidang yang memiliki tipe berbeda. Sebagai contoh, satu `struct Mahasiswa` dapat menyimpan NIM, nama, dan IPK. Modul 1 akan menggunakan larik berisi `struct` untuk mengolah data mahasiswa.
 
 Program berikut memperagakan ketiga level penyimpanan itu dalam satu tempat. Array satu dimensi `nilai` menyimpan lima angka berurutan, sedangkan matriks `2×3` disimpan secara *row-major* (baris demi baris: 1 2 3 4 5 6) sehingga `matriks[1][2]` bernilai 6. Kemudian array of struct `mhs` menyimpan tiga mahasiswa utuh, di mana setiap elemen diinisialisasi secara agregat seperti `{"230101", "Ahmad", 3.75}` yang mengisi field nim, nama, dan ipk secara berurutan. Operator titik (`mhs[i].nim`) dipakai untuk mengakses field, sedangkan versi panah (`->`) akan muncul pada studi kasus ketika datanya berupa pointer. Satu keterbatasan penting perlu dicatat: ukuran array statis seperti ini sudah dikunci saat compile, sehingga untuk ukuran yang baru diketahui saat program berjalan (input user) kita memerlukan alokasi dinamis `new[]` atau `vector`.
 
@@ -250,7 +252,7 @@ NIM		Nama	IPK
 
 ## 4. Studi Kasus: Data Nilai Mahasiswa
 
-Kini saatnya menggabungkan seluruh review ke dalam satu program utuh yang terasa seperti aplikasi nyata. Soalnya sederhana: simpan lima mahasiswa, hitung rata-rata IPK, dan temukan IPK tertinggi beserta pemiliknya. Namun ada misi tersembunyi di balik soal sederhana ini — program wajib memakai alokasi dinamis `new[]` dan traversal dengan *pointer arithmetic* `(data+i)->ipk`, sehingga mahasiswa berlatih membuktikan ekuivalensi `data[i].ipk ≡ (data+i)->ipk` yang menjadi kunci memahami Linked List di Modul 4.
+Studi kasus ini menggabungkan seluruh materi tinjauan ulang ke dalam satu program. Program menyimpan data lima mahasiswa, menghitung rata-rata IPK, serta menemukan mahasiswa dengan IPK tertinggi. Program menggunakan alokasi dinamis `new[]` dan penelusuran dengan aritmetika penunjuk `(data + i)->ipk`. Melalui langkah tersebut, mahasiswa dapat membuktikan bahwa `data[i].ipk` setara dengan `(data + i)->ipk`. Pemahaman ini akan membantu mahasiswa mempelajari senarai berantai pada Modul 4.
 
 Alur program terbagi dalam empat tahap yang runtut. Tahap pertama adalah alokasi dinamis `new Mahasiswa[5]`, yang meminta memori sebesar lima struct langsung dari *heap* saat program berjalan — kelebihannya, angka 5 ini bisa diganti variabel dari input user, sesuatu yang mustahil dilakukan array statis. Tahap kedua adalah loop input yang membaca NIM, nama, dan IPK untuk setiap mahasiswa; di sini `data[i].nim` memakai operator titik karena `data[i]` adalah objek struct hasil dereference implisit. Tahap ketiga adalah loop agregasi yang menjadi inti latihan: baris `total += (data+i)->ipk` menjumlahkan IPK lewat alamat elemen (`data+i`) dan operator panah (`->`), sementara variabel `maks` dan `idx` yang diinisialisasi dari elemen pertama terus diperbarui setiap kali ditemukan IPK yang lebih besar. Tahap terakhir mencetak hasil dan mengembalikan memori lewat `delete[] data` — tanda kurung siku di sana hukumnya wajib, karena tanpanya hanya elemen pertama yang dihancurkan dan sisanya bocor.
 
@@ -300,9 +302,9 @@ IPK Tertinggi : Dewi (230104) = 3.9
 
 ## 5. Tugas Praktikum
 
-1. **Tugas 1:** Buat program array 2D 3×3, tampilkan transpose-nya. Analisis time complexity-nya.
-2. **Tugas 2:** Tulis ulang studi kasus di atas menggunakan `vector<Mahasiswa>` dan reference (`for (auto &m : data)`).
-3. **Tugas 3 (Laporan):** Jelaskan perbedaan `int* p`, `int** q`, dan `int& r` disertai diagram memori.
+1. **Tugas 1:** Buatlah program yang menyimpan matriks berukuran 3 × 3, lalu tampilkan transposenya. Jelaskan kompleksitas waktu program tersebut.
+2. **Tugas 2:** Tulis ulang studi kasus di atas dengan menggunakan `vector<Mahasiswa>` dan referensi pada perulangan `for (auto &m : data)`.
+3. **Tugas 3 (laporan):** Jelaskan perbedaan antara `int* p`, `int** q`, dan `int& r`. Sertakan diagram memori untuk mendukung penjelasan.
 
 ## 6. Video Pembelajaran 🎬
 

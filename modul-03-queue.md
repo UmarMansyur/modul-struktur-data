@@ -1,18 +1,24 @@
-# Modul 3: Queue (Antrean)
+# Modul 3: Antrean (*Queue*)
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 1 × 100 menit | **Prasyarat:** Modul 2
 
-> **Cara menjalankan:** SEMUA kode di modul ini sekarang sudah lengkap dengan `main`. Copy utuh ke file `.cpp`, lalu `g++ -std=c++17 nama.cpp -o nama` lalu `./nama`. Lihat output di bawah tiap kode untuk cek.
+> **Panduan menjalankan program:**
+> 1. Salin satu contoh program secara utuh ke dalam berkas `.cpp`.
+> 2. Kompilasi program dengan perintah `g++ -std=c++17 nama.cpp -o nama`.
+> 3. Jalankan program dengan perintah `./nama` pada Linux/macOS atau `.\nama.exe` pada Windows.
+> 4. Bandingkan keluaran program dengan contoh keluaran pada bagian terkait.
 
 ## 1. Capaian Pembelajaran
 
-1. Menjelaskan prinsip FIFO dan operasi Enqueue, Dequeue, Front, Rear.
-2. Mengimplementasikan Linear Queue dan Circular Queue, menjelaskan masalah *memory wastage*.
-3. Mengenal Priority Queue.
-4. Mensimulasikan antrean layanan bank / printer spooler.
-5. Menjelaskan sejarah Queue (teori antrean Erlang) dan merefleksikan nilai filosofisnya (keadilan & kesabaran).
+Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-## 2. Sejarah & Nilai Filosofis
+1. Menjelaskan prinsip FIFO dan operasi `enqueue`, `dequeue`, `front`, serta `rear`.
+2. Mengimplementasikan antrean linear dan antrean melingkar serta menjelaskan masalah pemborosan ruang memori.
+3. Menjelaskan prinsip dasar antrean berprioritas (*priority queue*).
+4. Mensimulasikan antrean layanan bank dan penjadwalan dokumen pada pencetak.
+5. Menjelaskan sejarah teori antrean dan menghubungkan prinsip FIFO dengan penerapannya.
+
+## 2. Sejarah dan Nilai Filosofis
 
 **Sejarah singkat.** Teori antrean lahir dari masalah nyata: insinyur telepon Denmark **Agner Krarup Erlang (1909)** harus menghitung berapa operator yang dibutuhkan sentral telepon Kopenhagen agar penelepon tidak menunggu terlalu lama. Dari situ lahir rumus Erlang-B/C yang masih dipakai provider telekomunikasi hingga kini. Di ilmu komputer, antrean menjadi tulang punggung sistem: *print spooler* (cetakan mengantre), *job scheduler* OS, *buffer* jaringan, dan — yang menjembatani modul ini ke Modul 6 — ***Breadth-First Search* (BFS)**: graf dijelajahi lapis demi lapis dengan queue. Varian *circular buffer* lahir dari keterbatasan memori embedded: indeks melingkar agar sel terpakai ulang tanpa geser data. Adapun *priority queue* (biasanya heap, **J. W. J. Williams, 1964**) lahir dari kebutuhan yang berlawanan: tidak semua pelanggan sama — pasien gawat darurat harus menyalip antrean.
 
@@ -26,9 +32,9 @@
 
 > Renungan untuk laporan: amati satu antrean nyata (kantin, bank, SPBU). Apakah ia FIFO murni, circular (nomor berputar), atau prioritas (jalur lansia/disabilitas)? Apa yang terjadi jika aturannya dilanggar — dan bagaimana Anda memodelkannya dalam kode?
 
-## 3. Konsep FIFO (diperdalam)
+## 3. Konsep FIFO
 
-Queue = antrean loket: **pertama masuk, pertama keluar** (First In, First Out). `FRONT` = depan (keluar), `REAR` = belakang (masuk). Kebalikan dari Stack: operasi terjadi di **dua ujung berbeda**, tapi masing-masing tetap O(1).
+Antrean menerapkan prinsip **elemen pertama yang masuk akan keluar lebih dahulu** (*First In, First Out* atau FIFO). Variabel `FRONT` menunjuk elemen yang akan keluar, sedangkan `REAR` menunjuk posisi penambahan elemen. Berbeda dari tumpukan, antrean menjalankan operasi pada dua ujung yang berbeda. Setiap operasi utama tetap memiliki kompleksitas waktu O(1).
 
 ![FIFO queue](https://cdn.programiz.com/sites/tutorial2program/files/queue.png)
 *Gambar 1. Elemen 1 keluar sebelum 2. Sumber: Programiz.*
@@ -39,24 +45,24 @@ Queue = antrean loket: **pertama masuk, pertama keluar** (First In, First Out). 
 ![Circular increment](https://cdn.programiz.com/sites/tutorial2program/files/circular-increment.png)
 *Gambar 3. Circular queue: posisi kembali ke awal. Sumber: Programiz.*
 
-### Masalah Linear Queue (memory wastage)
+### Pemborosan Ruang pada Antrean Linear
 
-Pada array, setiap dequeue menggeser `FRONT` maju → sel depan **terbuang** (memory wastage) meski masih kosong. Contoh kapasitas 5: enqueue 5 elemen (REAR=4, penuh), dequeue 3 kali (FRONT=3) → hanya 2 elemen tersisa tapi `enqueue` menolak karena `REAR == MAX-1`. Solusi: **Circular Queue** dengan aritmetika modulo `(REAR+1) % SIZE` sehingga indeks kembali ke 0.
+Pada implementasi berbasis larik, setiap operasi `dequeue` memajukan `FRONT`. Akibatnya, program tidak dapat memakai kembali sel kosong di bagian depan ketika `REAR` sudah mencapai indeks terakhir. Sebagai contoh, antrean berkapasitas lima menolak elemen baru setelah `REAR` mencapai indeks 4, meskipun beberapa elemen di bagian depan sudah keluar. **Antrean melingkar** mengatasi masalah tersebut dengan operasi modulo `(REAR + 1) % SIZE` agar indeks dapat kembali ke awal larik.
 
 | Variasi | Ciri | Kondisi Full | Kapan dipakai |
 |---|---|---|---|
-| Linear | FRONT hanya maju | `REAR == SIZE-1` | Pengantar konsep saja |
+| Linear | `FRONT` hanya bergerak maju | `REAR == SIZE - 1` | Pengantar konsep |
 | Circular | Melingkar via modulo | `(REAR+1)%SIZE == FRONT` | Buffer, printer spooler, BFS |
 | Priority | Prioritas keluar dulu (heap) | tergantung heap | Penjadwalan, rumah sakit |
 | Deque | Dua ujung (depan-belakang) | tergantung implementasi | Sliding window, palindrom |
 
-### Mengapa operasi ujung selalu O(1)? (pendalaman)
+### Mengapa Operasi pada Ujung Antrean Memiliki Kompleksitas O(1)?
 
-Baik enqueue (di REAR) maupun dequeue (di FRONT), keduanya menyentuh langsung indeks yang sudah diketahui — tanpa geser, tanpa pencarian. Inilah bedanya dengan `vector::erase(begin())` yang O(n) karena menggeser semua elemen. Harga yang dibayar queue array: kapasitas tetap + logika bungkus (modulo) + satu sel korban (atau variabel `count`). Queue linked-list membayar dengan pointer + alokasi per elemen.
+Operasi `enqueue` mengakses `REAR`, sedangkan operasi `dequeue` mengakses `FRONT`. Kedua indeks tersebut sudah diketahui sehingga program tidak perlu mencari atau menggeser elemen. Sebaliknya, `vector::erase(begin())` memiliki kompleksitas O(n) karena operasi tersebut menggeser semua elemen setelah posisi awal. Antrean berbasis larik memerlukan kapasitas tetap dan logika modulo. Antrean berbasis senarai berantai memerlukan penunjuk serta alokasi memori untuk setiap elemen.
 
-### Deque: kakak queue yang lebih bebas
+### Antrean Dua Ujung (*Deque*)
 
-`std::deque` (*double-ended queue*) mengizinkan insert/delete di **kedua ujung** O(1) — gabungan stack + queue. Kegunaannya: cek palindrom (bandingkan depan-belakang), *sliding window maximum*, dan basis default `std::stack`/`std::queue` di STL. Jika soal butuh "antre tapi kadang menyalip dari depan", deque jawabannya.
+`std::deque` (*double-ended queue*) mendukung penambahan dan penghapusan elemen pada kedua ujung dengan kompleksitas O(1). Struktur ini dapat digunakan untuk memeriksa palindrom, menghitung *sliding window maximum*, serta menjadi kontainer bawaan bagi `std::stack` dan `std::queue`. Gunakan `deque` ketika masalah membutuhkan operasi pada bagian depan dan belakang secara langsung.
 
 ### Kesalahan umum pemula
 
@@ -66,7 +72,7 @@ Baik enqueue (di REAR) maupun dequeue (di FRONT), keduanya menyentuh langsung in
 4. **Modulo bilangan negatif** — `(REAR+1)%SIZE` aman karena REAR ≥ -1, tetapi rumus umum `(FRONT-1+SIZE)%SIZE` wajib tambah SIZE dulu agar tidak negatif.
 5. **Comparator priority_queue terbalik** — `return true` berarti "a tenggelam" (kalah prioritas). Uji selalu dengan 3 data yang urutan insert ≠ urutan keluar.
 
-### Queue di dunia nyata
+### Penerapan Antrean
 
 - **Sistem operasi:** print spooler, thread pool, interrupt buffer, packet queue router.
 - **BFS (Modul 6):** antrean vertex yang belum dikunjungi — jaminan jarak terpendek.
@@ -75,9 +81,9 @@ Baik enqueue (di REAR) maupun dequeue (di FRONT), keduanya menyentuh langsung in
 
 ## 4. Implementasi
 
-### 4.1 Linear Queue (Array)
+### 4.1 Antrean Linear Berbasis Larik
 
-**Tujuan kode:** memahami peran ganda FRONT/REAR dan konvensi kosong `FRONT == REAR == -1` sebelum naik ke versi circular yang lebih rumit.
+**Tujuan program:** Program menunjukkan fungsi `FRONT` dan `REAR` serta menggunakan kondisi `FRONT == REAR == -1` untuk menandai antrean kosong. Pemahaman ini menjadi dasar sebelum mahasiswa mempelajari antrean melingkar.
 
 ```cpp
 #include <iostream>
@@ -151,13 +157,13 @@ Underflow
 coba keluar saat kosong = -1
 ```
 
-> **Kata sulit = arti mudah:**
-> - *Queue (antrean)* = antre loket. Yang datang duluan, dilayani duluan.
-> - *FIFO (First In First Out)* = "yang pertama masuk, dia yang pertama keluar".
-> - *enqueue* = masuk antre (dari belakang). *dequeue* = keluar antre (dari depan). *front* = ngintip siapa paling depan.
-> - *FRONT* = penunjuk orang paling depan. *REAR* = penunjuk orang paling belakang.
+> **Istilah penting:**
+> - **Antrean (*queue*)** melayani elemen berdasarkan urutan kedatangannya.
+> - **FIFO (*First In, First Out*)** berarti elemen pertama yang masuk akan keluar lebih dahulu.
+> - Operasi **`enqueue`** menambahkan elemen dari belakang, **`dequeue`** menghapus elemen dari depan, dan **`front`** membaca elemen terdepan.
+> - Variabel **`FRONT`** menunjuk elemen terdepan, sedangkan **`REAR`** menunjuk elemen paling belakang.
 
-**Penjelasan detail (pakai kalimat pendek):**
+**Penjelasan program:**
 
 - **Konstruktor `FRONT = REAR = -1`:** menandai kosong. Alternatif populer: `front = 0, rear = -1, count = 0` (Tugas 3) yang tidak butuh reset — tapi konvensi -1/-1 di sini paling mudah untuk pemula.
 - **`enqueue`:**
@@ -173,9 +179,9 @@ coba keluar saat kosong = -1
 - **Trace kapasitas 3:** enqueue(10,20) → F=0,R=1; dequeue → return 10, F=1; dequeue → return 20, F=R=1→reset F=R=-1 (kosong); dequeue → "Underflow".
 - **Kompleksitas:** semua O(1). Kelemahan satu-satunya adalah wastage di atas.
 
-### 4.2 Circular Queue
+### 4.2 Antrean Melingkar
 
-**Tujuan kode:** memperbaiki linear queue — indeks **membungkus** dengan modulo sehingga sel depan yang kosong bisa dipakai lagi. Satu-satunya konsep baru adalah `(x+1) % SIZE`.
+**Tujuan program:** Program memperbaiki keterbatasan antrean linear dengan membungkus indeks melalui operasi modulo. Dengan cara ini, program dapat menggunakan kembali sel kosong di bagian depan. Rumus utama yang digunakan adalah `(x + 1) % SIZE`.
 
 ```cpp
 #include <iostream>
@@ -252,23 +258,23 @@ Penuh!
 isi (dari depan): 30 40 50 60 (FRONT=2 REAR=0)
 ```
 
-> **Kata sulit = arti mudah:**
-> - *Circular (melingkar)* = kursi melingkar. Kalau sudah di ujung, balik lagi ke awal. Jadi tempat kosong depan bisa dipakai lagi.
-> - *Modulo (%)* = sisa bagi. Contoh `(4+1)%5 = 0` artinya "habis nomor 4, balik ke 0".
-> - *Memory wastage (tempat terbuang)* = ada kursi kosong tapi tidak bisa dipakai. Antrean biasa boros, antrean melingkar hemat.
+> **Istilah penting:**
+> - Antrean **melingkar (*circular*)** mengembalikan indeks ke awal setelah mencapai indeks terakhir sehingga program dapat memakai kembali ruang kosong.
+> - Operator **modulo (`%`)** menghasilkan sisa pembagian. Sebagai contoh, `(4 + 1) % 5 = 0` mengembalikan indeks 4 ke indeks 0.
+> - **Pemborosan ruang (*memory wastage*)** terjadi ketika larik masih memiliki sel kosong, tetapi implementasi antrean linear tidak dapat menggunakannya kembali.
 
-**Penjelasan detail (pakai kalimat pendek):**
+**Penjelasan program:**
 
 - **Modulo sebagai "belokan":** `(REAR+1) % SIZE` memetakan `4 → 0` (untuk SIZE 5). Jadi setelah REAR=4, enqueue berikut menempati sel 0 yang sudah kosong — tidak ada sel terbuang selama jumlah elemen < SIZE.
 - **`isFull`: `(REAR+1)%SIZE == FRONT`** — "slot berikutnya dari REAR adalah FRONT" berarti lingkaran penuh. Konsekuensinya ada **satu sel yang selalu dikorbankan** (kapasitas efektif SIZE−1) agar kondisi full bisa dibedakan dari kondisi `FRONT == REAR` yang dipakai untuk... elemen tunggal! Alternatif tanpa korban: simpan `count` terpisah (Tugas 3) — full saat `count == SIZE`, empty saat `count == 0`.
 - **`enqueue`:** urutan guard → bangunkan FRONT → majukan REAR melingkar → tulis. Perhatikan REAR awal -1: `(-1+1)%5 = 0` → slot 0, benar untuk elemen pertama (di C++ `(-1+1)` = 0 dulu baru modulo, aman; hati-hati modulo bilangan negatif murni di kasus lain).
 - **`dequeue`:** identik dengan linear kecuali `FRONT = (FRONT+1)%SIZE` (maju melingkar). Cabang reset terakhir tetap ada.
-- **Trace SIZE=5:** enqueue 10,20,30,40,50 → F=0,R=4 (full, karena (4+1)%5=0==F). dequeue×2 → F=2 (10,20 keluar). enqueue(60) → R=(4+1)%5=0 → sel 0 dipakai ulang! Isi logis: 30,40,50,60. Inilah yang mustahil di linear queue.
+- **Jejak untuk `SIZE = 5`:** Program menerima `10, 20, 30, 40` sehingga `FRONT = 0` dan `REAR = 3`. Kapasitas efektifnya berjumlah empat elemen karena implementasi mengorbankan satu sel. Setelah dua operasi `dequeue`, `FRONT` berpindah ke indeks 2. Program kemudian memasukkan `50` pada indeks 4 dan `60` pada indeks 0. Isi logis antrean menjadi `30, 40, 50, 60`. Contoh ini menunjukkan bahwa antrean melingkar dapat menggunakan kembali ruang di bagian depan.
 - **Kompleksitas:** tetap O(1) semua operasi; modulo adalah operasi aritmetika konstan.
 
-### 4.3 Priority Queue (pengenalan, STL)
+### 4.3 Pengenalan Antrean Berprioritas dengan STL
 
-**Ide sederhana:** bukan antre biasa. Yang keluar duluan = yang paling penting. Contoh: pasien gawat darurat boleh maju duluan. Di komputer ini disebut *heap (tumpukan prioritas)*, bukan array geser.
+**Gagasan utama:** Antrean berprioritas mengeluarkan elemen berdasarkan tingkat kepentingannya, bukan semata-mata berdasarkan urutan kedatangan. Sebagai contoh, layanan gawat darurat mendahulukan pasien dengan kondisi paling kritis. C++ biasanya mengimplementasikan struktur ini dengan *heap*.
 
 ```cpp
 #include <queue>
@@ -289,7 +295,7 @@ int main() {
 
 **Cara menjalankan:** `g++ -std=c++17 queue_prioritas.cpp -o queue_prioritas` lalu `./queue_prioritas`. Output: `Keluar (yang besar dulu): 50 30 10`.
 
-> **Kata sulit = arti mudah:** *priority (prioritas)* = tingkat penting. *heap* = cara simpan data biar yang paling penting selalu di atas.
+> **Istilah penting:** **Prioritas** menunjukkan tingkat kepentingan suatu elemen, sedangkan **heap** mengatur data agar elemen dengan prioritas tertinggi dapat diakses secara efisien.
 
 **Penjelasan (kalimat pendek):**
 
@@ -298,9 +304,9 @@ int main() {
 - Output `50 30 10` membuktikan urutan keluar = urutan nilai, bukan urutan masuk. Untuk min-heap (terkecil dulu): `priority_queue<int, vector<int>, greater<int>>`.
 - Untuk tipe custom (struct Nasabah), heap butuh **comparator** — lihat studi kasus di bawah.
 
-## 5. Studi Kasus: Antrean Bank & Printer Spooler
+## 5. Studi Kasus: Antrean Bank dan Penjadwalan Pencetak
 
-**Soal dua bagian:** (1) bank 1 loket = FIFO murni dengan `std::queue`; (2) printer = prioritas (dokumen VIP menyalip) dengan `priority_queue` + comparator custom.
+**Ruang lingkup studi kasus:** Bagian pertama memodelkan satu loket bank dengan prinsip FIFO menggunakan `std::queue`. Bagian kedua memodelkan penjadwalan dokumen pada pencetak menggunakan `priority_queue` dan pembanding khusus.
 
 ```cpp
 #include <iostream>
@@ -356,13 +362,13 @@ Urutan cetak:
 - Tugas-5hlm
 ```
 
-> **Bahasa mudah:** bank = antre adil (siapa dulu, dia dulu). Printer VIP = yang penting boleh nyalip. Dua-duanya pakai kode yang sudah ada `main`-nya, tinggal copy semua lalu jalan.
+> **Ringkasan:** Antrean bank menggunakan urutan kedatangan, sedangkan penjadwalan pencetak dapat mendahulukan dokumen yang memiliki prioritas lebih tinggi. Kedua contoh program sudah memiliki fungsi `main` dan dapat langsung dikompilasi.
 
 ## 6. Tugas Praktikum 🧩
 
-> Kumpulkan tiap tugas sebagai **file `.cpp` + screenshot output + analisis di laporan**. Pastikan `g++ -std=c++17` tanpa error.
+> Kumpulkan setiap tugas dalam bentuk **berkas `.cpp`, tangkapan layar keluaran, dan analisis dalam laporan**. Pastikan `g++ -std=c++17` dapat mengompilasi program tanpa galat.
 
-### 🟢 Level Beginner — *Memahami Gerakan Dasar*
+### 🟢 Tingkat Dasar — *Memahami Langkah Dasar*
 
 **Tugas B1: Linear Queue Manual + Jejak FRONT/REAR (wajib).**
 1. Salin class `Queue` dari kode 4.1 ke `queue_b1.cpp`.
@@ -376,7 +382,7 @@ Urutan cetak:
 3. Tulis 1 paragraf: mengapa `pop()` STL tidak mengembalikan nilai — dan pola aman apa yang harus dipakai?
 *Kriteria nilai:* perintah berjalan (50%), skenario uji lengkap (25%), penjelasan pola front-then-pop (25%).
 
-### 🟡 Level Medium — *Menerapkan Varian*
+### 🟡 Tingkat Menengah — *Menerapkan Varian*
 
 **Tugas M1: Circular Queue + Bukti Penghematan.**
 1. Salin `CircularQueue` (SIZE=5) ke `queue_m1.cpp`. Lakukan: enqueue 10,20,30,40,50 (hingga full) → dequeue 2× → enqueue 60,70 → cetak isi logis (harusnya 30,40,50,60 — 70 ditolak "Penuh!").
@@ -390,7 +396,7 @@ Urutan cetak:
 3. Analisis: apa yang terjadi jika 1 loket tutup (semua ke 1 antrean)? Hitung ulang rata-ratanya dan simpulkan.
 *Kriteria nilai:* pemisahan genap/ganjil benar (30%), hitung tunggu + rata-rata (40%), analisis 1-loket (30%).
 
-### 🔴 Level Expert — *Menggabungkan & Menganalisis*
+### 🔴 Tingkat Lanjut — *Menggabungkan dan Menganalisis*
 
 **Tugas E1: Queue Linked-List + Circular dengan `count` (tanpa sel korban).**
 1. Implementasikan **Queue berbasis Linked List** (enqueue di tail, dequeue di head, O(1) keduanya) — jembatan ke Modul 4. Uji enqueue 5 data + dequeue 2 + tampil.

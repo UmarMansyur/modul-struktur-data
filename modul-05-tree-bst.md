@@ -1,18 +1,24 @@
-# Modul 5: Tree & Binary Search Tree (BST)
+# Modul 5: Pohon dan *Binary Search Tree* (BST)
 
-> **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 4 (pointer, Linked List, rekursi)
+> **Mata Kuliah:** Struktur Data | **Durasi:** 2 × 100 menit | **Prasyarat:** Modul 4 (penunjuk, senarai berantai, dan rekursi)
 
-> **Cara menjalankan:** kode dasar `BST` dan studi kasus `direktori.cpp` di modul ini sudah lengkap dengan `main`. Simpan ke `bst.cpp` / `direktori.cpp`, lalu `g++ -std=c++17 bst.cpp -o bst` lalu `./bst`.
+> **Panduan menjalankan program:**
+> 1. Simpan contoh dasar BST sebagai `bst.cpp` atau contoh studi kasus sebagai `direktori.cpp`.
+> 2. Kompilasi program, misalnya dengan perintah `g++ -std=c++17 bst.cpp -o bst`.
+> 3. Jalankan program dengan perintah `./bst` pada Linux/macOS atau `.\bst.exe` pada Windows.
+> 4. Bandingkan keluaran program dengan contoh keluaran pada bagian terkait.
 
 ## 1. Capaian Pembelajaran
 
-1. Menjelaskan terminologi: Root, Parent, Child, Leaf, Height, Depth.
-2. Mengimplementasikan BST: Insertion, Deletion, Searching.
-3. Mengimplementasikan traversal In-Order, Pre-Order, Post-Order, Level-Order.
-4. Menyelesaikan studi kasus hirarki organisasi / file directory.
-5. Menjelaskan sejarah Tree/BST dan merefleksikan nilai filosofisnya (hirarki & keseimbangan).
+Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-## 2. Sejarah & Nilai Filosofis
+1. Menjelaskan istilah akar, induk, anak, daun, tinggi, dan kedalaman pada pohon.
+2. Mengimplementasikan operasi penyisipan, penghapusan, dan pencarian pada BST.
+3. Mengimplementasikan penelusuran *in-order*, *pre-order*, *post-order*, dan *level-order*.
+4. Menyelesaikan studi kasus hierarki organisasi atau direktori berkas.
+5. Menjelaskan sejarah pohon dan BST serta menganalisis pengaruh keseimbangan pohon terhadap kinerja.
+
+## 2. Sejarah dan Nilai Filosofis
 
 **Sejarah singkat.** Pohon adalah struktur data tertua yang dipinjam dari kehidupan: silsilah keluarga, taksonomi makhluk hidup (Linnaeus), hingga bagan organisasi. Di komputer, pohon biner dipakai untuk kompresi **Huffman (1952)** dan parsing ekspresi. Aturan *kiri < parent < kanan* (BST) membuat pencarian melompat setengah pohon tiap langkah — sepupu dekat binary search (Modul 1). Masalahnya: BST bisa miring menjadi list O(n) jika insert terurut. Maka lahirlah pohon *self-balancing*: **AVL (Adelson-Velsky & Landis, 1962)** — pohon pertama yang menyeimbangkan diri otomatis — disusul Red-Black Tree (penopang `std::map` C++) dan B-Tree (penopang database & filesystem). Level-order modul ini (memakai queue!) adalah jembatan ke BFS graf (Modul 6).
 
@@ -26,7 +32,7 @@
 
 > Renungan untuk laporan: gambarkan "pohon" keluarga/organisasi Anda (root, parent, leaf-nya), ukur height-nya, lalu jawab: apakah ia seimbang? Operasi rotasi apa (desentralisasi? promosi?) yang akan menyeimbangkannya?
 
-## 3. Terminologi (diperdalam)
+## 3. Terminologi Dasar
 
 ```
         50 (Root, Depth 0)
@@ -36,13 +42,13 @@
 20  40  60  80 (Leaf)
 ```
 
-- **Root:** simpul teratas (tidak punya parent). **Parent/Child:** relasi langsung. **Leaf:** tanpa anak. **Height:** jumlah sisi terpanjang root→leaf (pohon di atas = 2). **Depth:** jarak node→root (node 40 ber-depth 2).
-- **BST rule:** untuk setiap node berlaku `kiri < parent < kanan` — dan ini harus benar di **seluruh subtree**, bukan hanya anak langsung. Satu pelanggaran jauh di bawah merusak seluruh pencarian.
-- Konsekuensi rule: **in-order BST selalu menghasilkan urutan terurut** — properti yang dimanfaatkan studi kasus direktori alfabetis.
+- **Akar (*root*)** merupakan simpul teratas dan tidak memiliki induk. **Induk (*parent*)** dan **anak (*child*)** menyatakan hubungan langsung antarsimpul. **Daun (*leaf*)** merupakan simpul tanpa anak. **Tinggi (*height*)** menyatakan jumlah sisi pada jalur terpanjang dari akar menuju daun. **Kedalaman (*depth*)** menyatakan jarak suatu simpul dari akar.
+- **Aturan BST:** setiap simpul harus memenuhi hubungan `kiri < induk < kanan` pada seluruh subpohon, bukan hanya pada anak langsung. Pelanggaran terhadap aturan ini dapat menghasilkan proses pencarian yang salah.
+- Penelusuran **in-order** pada BST menghasilkan data yang terurut. Studi kasus direktori memanfaatkan sifat tersebut untuk menampilkan nama secara alfabetis.
 
 > Visualisasi interaktif (sangat disarankan dibuka saat praktikum): **VisuAlgo BST** – https://visualgo.net/en/bst
 
-### Traversal (4 cara mengunjungi semua node)
+### Empat Metode Penelusuran Pohon
 
 ![Inorder traversal](https://media.geeksforgeeks.org/wp-content/uploads/20250310153932992164/Inorder-Traversal-of-Binary-Tree-1.webp)
 *Gambar 1. In-Order (kiri → root → kanan). Sumber: GeeksforGeeks.*
@@ -60,14 +66,14 @@
 | Post-Order | kiri, kanan, root | 20 40 30 60 80 70 50 | Hapus tree (anak dulu baru parent) |
 | Level-Order | per level (pakai Queue) | 50 30 70 20 40 60 80 | BFS, tampil per tingkat |
 
-### Kapan memakai traversal apa? (pendalaman — hafalkan polanya)
+### Pemilihan Metode Penelusuran
 
 - **In-order** = "baca BST seperti buku": selalu terurut untuk BST. Dipakai untuk validasi (hasil harus ascending), cetak kamus/daftar alfabetis, dan mengubah BST → array terurut.
 - **Pre-order** = "fotokopi struktur": root dulu, sehingga dari hasil pre-order (+ in-order) struktur pohon bisa direkonstruksi. Dipakai untuk serialisasi, bagan organisasi (atasan dicetak sebelum bawahan), dan prefix expression.
 - **Post-order** = "bereskan anak dulu": dipakai untuk **delete tree** (jangan hapus parent sebelum anaknya!) dan evaluasi expression tree (operand dulu baru operator).
 - **Level-order** = "absensi per angkatan": satu-satunya yang iteratif (queue). Dipakai untuk BFS, cetak per tingkat, dan mencari node terdangkal.
 
-### Height vs Depth vs Size (jangan tertukar!)
+### Perbedaan Tinggi, Kedalaman, dan Ukuran
 
 - **Depth(node)** = jarak node → root (root = 0). **Height(node)** = jarak terjauh node → leaf di bawahnya (leaf = 0). **Height(tree)** = height(root). **Size** = jumlah node.
 - Pohon seimbang n node → height O(log n); pohon miring (insert terurut 1..n) → height O(n) = list berkedok pohon! Inilah motivasi AVL/Red-Black.
@@ -81,9 +87,9 @@
 4. **Hapus 2 anak dengan menyalin pointer (bukan nilai)** → dua subtree yatim / double-free. Salin `data`, lalu hapus successor secara rekursif.
 5. **Rekursi tanpa basis `if (!t) return`** → segfault. Setiap fungsi rekursif wajib punya pintu keluar.
 
-## 4. Implementasi BST (C++)
+## 4. Implementasi BST dalam C++
 
-**Tujuan kode:** memahami 4 operasi rekursif (insert/search/delete/traversal) + 1 iteratif (level-order). Kunci pola: setiap fungsi menerima `Node* t` (subtree saat ini) dan mengembalikan subtree hasil — pola yang sama dipakai di `main` (`bst.root = insert(...)`).
+**Tujuan program:** Program menerapkan empat operasi rekursif, yaitu penyisipan, pencarian, penghapusan, dan penelusuran, serta satu penelusuran iteratif dengan metode *level-order*. Setiap fungsi rekursif menerima `Node* t` sebagai akar subpohon saat ini dan mengembalikan akar subpohon setelah operasi selesai. Fungsi `main` menerapkan pola tersebut melalui pernyataan seperti `bst.root = insert(...)`.
 
 ```cpp
 #include <iostream>
@@ -187,7 +193,7 @@ Level: 50 30 70 20 40 60 80
 Setelah hapus 30: 20 40 50 60 70 80
 ```
 
-## 5. Studi Kasus: File Directory System
+## 5. Studi Kasus: Sistem Direktori Berkas
 
 **Soal:** setiap folder = node BST (key = nama folder). In-order menghasilkan daftar alfabetis; pre-order dengan indentasi depth menghasilkan tampilan `tree` di terminal.
 
@@ -275,13 +281,13 @@ Daftar alfabet (in-order): bin etc home root tmp user var
 Path user: /root/var/user
 ```
 
-> **Kata sulit = arti mudah:**
-> - *Tree (pohon)* = bagan atasan-bawahan. *Root (akar)* = paling atas. *Parent (induk)* = atasan langsung di pohon. *Child (anak)* = bawahan langsung. *Leaf (daun)* = yang tidak punya anak.
-> - *BST (pohon cari)* = pohon yang kiri lebih kecil, kanan lebih besar. Jadi gampang cari.
-> - *In-order* = baca kiri-atas-kanan, hasilnya urut alfabet. *Pre-order* = baca atas dulu, cocok untuk cetak bagan.
-> - *Path* = alamat dari atas sampai folder itu lewat `parent`, mis. `/root/var/user`.
+> **Istilah penting:**
+> - **Pohon (*tree*)** menyusun simpul secara hierarkis. **Akar (*root*)** berada pada tingkat teratas, **induk (*parent*)** terhubung langsung dengan **anak (*child*)**, dan **daun (*leaf*)** tidak memiliki anak.
+> - **BST** menempatkan nilai yang lebih kecil di subpohon kiri dan nilai yang lebih besar di subpohon kanan.
+> - Penelusuran **in-order** mengunjungi kiri–akar–kanan dan menghasilkan urutan alfabetis pada BST string. Penelusuran **pre-order** mengunjungi akar terlebih dahulu sehingga sesuai untuk mencetak bagan.
+> - **Jalur (*path*)** menunjukkan urutan simpul dari akar menuju simpul tujuan, misalnya `/root/var/user`.
 
-**Catatan jujur (penting):** `parent` di sini = induk di pohon cari, bukan folder induk asli. Jadi `user` ada di bawah `var` karena `u` < `v` secara alfabet, bukan karena folder user ada di dalam var. Yang penting: `in-order` selalu alfabet dan `path` benar menelusuri `parent`. Coba ganti urutan `tambah`, bagan berubah tapi daftar alfabet tetap sama — itulah bukti BST bekerja.
+> **Catatan:** `parent` pada contoh ini menunjukkan induk dalam BST, bukan direktori induk pada sistem berkas yang sebenarnya. Simpul `user` berada di bawah `var` karena huruf `u` mendahului `v` secara alfabetis. Urutan penyisipan dapat mengubah bentuk pohon, tetapi penelusuran `in-order` tetap menghasilkan daftar alfabetis.
 
 **Penjelasan rancangan (untuk diimplementasikan sebagai Tugas 3):**
 
@@ -291,9 +297,9 @@ Path user: /root/var/user
 
 ## 6. Tugas Praktikum 🧩
 
-> Kumpulkan tiap tugas sebagai **file `.cpp` + screenshot output + analisis di laporan**. Pastikan `g++ -std=c++17` tanpa error.
+> Kumpulkan setiap tugas dalam bentuk **berkas `.cpp`, tangkapan layar keluaran, dan analisis dalam laporan**. Pastikan `g++ -std=c++17` dapat mengompilasi program tanpa galat.
 
-### 🟢 Level Beginner — *Menjelajah Pohon*
+### 🟢 Tingkat Dasar — *Menjelajahi Pohon*
 
 **Tugas B1: Height, Leaf, Size + 4 Traversal (wajib).**
 1. Salin class `BST` modul ke `tree_b1.cpp`. Tambahkan `int height(Node* t)`, `int countLeaf(Node* t)`, `int size(Node* t)` (semua rekursif).
@@ -307,7 +313,7 @@ Path user: /root/var/user
 3. Jawab: mengapa search BST O(h) bukan O(n)? Kapan ia merosot jadi O(n)? (beri contoh urutan insert penyebabnya).
 *Kriteria nilai:* insert bertahap + cetak (40%), search + jalur (30%), analisis O(h) vs O(n) (30%).
 
-### 🟡 Level Medium — *Validasi & Hapus*
+### 🟡 Tingkat Menengah — *Validasi dan Penghapusan*
 
 **Tugas M1: Validasi BST (rentang min–max).**
 1. Implementasikan `bool isBST(Node* t, long mn, long mx)` — node valid jika `mn < data < mx`; rekursi kiri dengan `mx = data`, kanan dengan `mn = data`. Panggil awal dengan `LONG_MIN/LONG_MAX`.
@@ -317,11 +323,11 @@ Path user: /root/var/user
 
 **Tugas M2: Hapus 3 Kasus + Bukti Terurut.**
 1. Hapus dari pohon contoh secara berurutan: leaf (`20`), node 1 anak (setelah itu), node 2 anak (`30` dan `50`). Setelah tiap hapus, cetak in-order dan pastikan tetap ascending!
-2. Dokumentasikan successor yangdipilih tiap hapus-2-anak + trace penyambungan (`t->kanan = hapus(...)`).
+2. Dokumentasikan *successor* yang dipilih pada setiap penghapusan simpul dengan dua anak. Sertakan jejak penyambungan melalui `t->kanan = hapus(...)`.
 3. Analisis: mengapa hapus-2-anak wajib via successor (bukan menaikkan sembarang anak)? Apa yang rusak jika aturan dilanggar?
 *Kriteria nilai:* 3 kasus hapus benar (50%), in-order tetap terurut tiap tahap (25%), analisis successor (25%).
 
-### 🔴 Level Expert — *Organisasi & Keseimbangan*
+### 🔴 Tingkat Lanjut — *Organisasi dan Keseimbangan*
 
 **Tugas E1: Hirarki Organisasi + Path + Level.**
 1. Ganti `int` menjadi `string jabatan` (BST alfabetis): insert 10 jabatan (mis. Rektor, Dekan, Kaprodi, ...). Cetak pre-order berindentasi sebagai bagan + in-order sebagai daftar alfabetis.

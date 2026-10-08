@@ -1,18 +1,24 @@
-# Modul 2: Stack (Tumpukan)
+# Modul 2: Tumpukan (*Stack*)
 
 > **Mata Kuliah:** Struktur Data | **Durasi:** 1 × 100 menit | **Prasyarat:** Modul 1
 
-> **Cara menjalankan:** SEMUA kode di modul ini sekarang sudah lengkap dengan `main` yang bisa langsung jalan. Copy dari `#include` sampai `return 0` ke file `.cpp`, lalu `g++ -std=c++17 nama.cpp -o nama` lalu `./nama`. Lihat output di bawah tiap kode.
+> **Panduan menjalankan program:**
+> 1. Salin satu contoh program secara utuh, mulai dari `#include` sampai `return 0`, ke dalam berkas `.cpp`.
+> 2. Kompilasi program dengan perintah `g++ -std=c++17 nama.cpp -o nama`.
+> 3. Jalankan program dengan perintah `./nama` pada Linux/macOS atau `.\nama.exe` pada Windows.
+> 4. Bandingkan keluaran program dengan contoh keluaran pada bagian terkait.
 
 ## 1. Capaian Pembelajaran
 
-1. Menjelaskan prinsip LIFO dan operasi Push, Pop, Peek/Top, IsEmpty, IsFull.
-2. Mengimplementasikan Stack berbasis Array dan berbasis Linked List, membandingkan keduanya.
-3. Menyelesaikan konversi bolak-balik Infix ↔ Postfix ↔ Prefix dan evaluasi ekspresi.
-4. Mensimulasikan fitur Undo/Redo pada text editor.
-5. Menjelaskan sejarah Stack dan merefleksikan nilai filosofisnya (disiplin LIFO).
+Setelah menyelesaikan modul ini, mahasiswa mampu:
 
-## 2. Sejarah & Nilai Filosofis
+1. Menjelaskan prinsip LIFO dan operasi `push`, `pop`, `peek`/`top`, `isEmpty`, serta `isFull`.
+2. Mengimplementasikan tumpukan berbasis larik dan senarai berantai serta membandingkan karakteristik keduanya.
+3. Mengonversi notasi infiks, postfiks, dan prefiks serta mengevaluasi ekspresi.
+4. Mensimulasikan fitur urungkan dan ulangi (*undo/redo*) pada penyunting teks.
+5. Menjelaskan sejarah tumpukan dan menghubungkan prinsip LIFO dengan penggunaan praktisnya.
+
+## 2. Sejarah dan Nilai Filosofis
 
 **Sejarah singkat.** Istilah *stack* (Jerman: *Keller* = gudang/ruang bawah tanah) diperkenalkan oleh **Friedrich L. Bauer dan Klaus Samelson (1957)** untuk mengevaluasi ekspresi dalam bahasa ALGOL — salah satu fondasi bahasa pemrograman modern. Tak lama kemudian **Edsger W. Dijkstra (1961)** memakai tumpukan dalam algoritma *shunting-yard* untuk konversi infix → postfix (Studi Kasus 1 modul ini!). Konsep yang sama melahirkan *pushdown automaton* di teori komputasi dan — yang paling sering Anda pakai tanpa sadar — ***call stack***: setiap pemanggilan fungsi di C++ didorong ke stack memori dan di-pop saat `return`. Itulah sebabnya rekursi yang terlalu dalam menghasilkan error legendaris ***stack overflow*** (nama itu pula yang dipakai forum Q&A terbesar programmer dunia, Stack Overflow, founded 2008).
 
@@ -26,9 +32,9 @@
 
 > Renungan untuk laporan: ceritakan satu kebiasaan sehari-hari Anda yang LIFO (mis. tumpukan baju, riwayat browser Back, Ctrl+Z) dan satu yang FIFO. Kapan Anda memakai masing-masing — dan apa akibatnya jika tertukar?
 
-## 3. Konsep LIFO (diperdalam)
+## 3. Konsep LIFO
 
-Stack = tumpukan piring: yang **terakhir masuk, pertama keluar** (Last In, First Out). `TOP` menunjuk elemen teratas. Semua operasi hanya di satu ujung, sehingga push/pop/peek **selalu O(1)** — tidak ada traversal.
+Tumpukan menerapkan prinsip **elemen terakhir yang masuk akan keluar lebih dahulu** (*Last In, First Out* atau LIFO). Variabel `TOP` menunjuk elemen teratas. Operasi `push`, `pop`, dan `peek` hanya mengakses satu ujung sehingga masing-masing memiliki kompleksitas waktu O(1).
 
 ![Diagram LIFO push/pop](https://upload.wikimedia.org/wikipedia/commons/e/e4/Lifo_stack.svg)
 *Gambar 1. Prinsip LIFO. Sumber: Wikimedia Commons (CC0).*
@@ -41,16 +47,16 @@ Stack = tumpukan piring: yang **terakhir masuk, pertama keluar** (Last In, First
 
 | Operasi | Fungsi | Kompleksitas | Kondisi gagal |
 |---|---|---|---|
-| `push(x)` | Tambah ke atas | O(1) | Overflow (array penuh) |
-| `pop()` | Ambil + hapus dari atas | O(1) | Underflow (kosong) |
-| `peek()/top()` | Intip tanpa hapus | O(1) | Underflow |
-| `isEmpty/isFull` | Cek kondisi | O(1) | — |
+| `push(x)` | Menambahkan elemen ke bagian atas | O(1) | *Overflow* (larik penuh) |
+| `pop()` | Mengambil dan menghapus elemen teratas | O(1) | *Underflow* (tumpukan kosong) |
+| `peek()`/`top()` | Membaca elemen teratas tanpa menghapusnya | O(1) | *Underflow* |
+| `isEmpty()`/`isFull()` | Memeriksa kondisi tumpukan | O(1) | — |
 
-### Mengapa semua O(1)? (pendalaman)
+### Mengapa Operasi Utama Memiliki Kompleksitas O(1)?
 
-Karena `TOP` selalu menunjuk ujung operasi, tidak ada pergeseran elemen dan tidak ada pencarian. Bandingkan dengan array biasa: `insert` di tengah butuh geser O(n); di stack, posisi operasi sudah dikunci di satu ujung. Inilah kekuatan sekaligus keterbatasan stack: **super cepat, tapi super kaku** — Anda tidak bisa mengakses elemen tengah tanpa mem-pop semua di atasnya. Kekakuan inilah yang justru membuatnya aman untuk call stack dan parser: tidak ada jalan pintas yang merusak urutan.
+Variabel `TOP` selalu menunjuk lokasi operasi, sehingga algoritma tidak perlu menggeser atau mencari elemen. Sebaliknya, penyisipan di tengah larik biasa membutuhkan pergeseran elemen dengan kompleksitas O(n). Efisiensi tersebut juga membatasi akses: program tidak dapat mengambil elemen di tengah tumpukan sebelum mengeluarkan seluruh elemen di atasnya. Aturan ini menjaga urutan proses pada *call stack* dan parser.
 
-### Call stack: stack yang menjalankan program Anda
+### *Call Stack*: Tumpukan yang Mendukung Eksekusi Program
 
 Setiap kali program C++ memanggil fungsi, sistem mendorong *frame* (alamat kembali + variabel lokal + parameter) ke call stack memori. Saat fungsi `return`, frame di-pop. Urutannya persis LIFO — fungsi yang dipanggil terakhir selesai pertama. Konsekuensinya:
 - Rekursi = fungsi memanggil dirinya sendiri = frame menumpuk. Basis rekursi yang hilang → frame menumpuk sampai memori habis → ***stack overflow*** (segmentation fault).
@@ -64,7 +70,7 @@ Setiap kali program C++ memanggil fungsi, sistem mendorong *frame* (alamat kemba
 3. **`top()` + `pop()` STL dipisah** — `std::stack::pop()` bertipe `void` (demi exception-safety), jadi pola wajibnya `auto v = st.top(); st.pop();`. Menulis `x = st.pop();` tidak akan compile.
 4. **Stack linked-list bocor** — push memakai `new` tetapi lupa `delete` di pop/destructor → memory leak. Setiap node yang didorong harus ada yang bertanggung jawab mem-pop-nya.
 
-### Stack di dunia nyata
+### Penerapan Tumpukan
 
 - **Browser Back / Forward:** riwayat halaman = stack (Back = pop ke stack forward).
 - **Undo/Redo (VS Code, Word, Photoshop):** dua stack snapshot/delta (Studi Kasus 2).
@@ -74,9 +80,9 @@ Setiap kali program C++ memanggil fungsi, sistem mendorong *frame* (alamat kemba
 
 ## 4. Implementasi
 
-### 4.1 Berbasis Array (ukuran tetap, risiko overflow)
+### 4.1 Implementasi Berbasis Larik
 
-**Tujuan kode:** implementasi paling hemat dan cepat. `TOP` = indeks elemen teratas; konvensi `TOP = -1` berarti kosong. Pola pre-increment / post-decrement di bawah adalah idiom stack array yang wajib dihafal.
+**Tujuan program:** Program mengimplementasikan tumpukan berkapasitas tetap dengan menggunakan larik. Variabel `TOP` menyimpan indeks elemen teratas, sedangkan nilai `TOP = -1` menandakan tumpukan kosong. Implementasi ini menggunakan pola *pre-increment* pada `push` dan *post-decrement* pada `pop`.
 
 ```cpp
 #include <iostream>
@@ -164,15 +170,14 @@ Underflow!
 pop() saat kosong = -1 (muncul Underflow!)
 ```
 
-> **Kata sulit = arti mudah (biar paham):**
-> - *Stack / tumpukan* = tumpukan piring. Ambil harus dari atas.
-> - *LIFO (Last In First Out)* = "yang terakhir masuk, dia yang pertama keluar".
-> - *push* = taruh piring baru di atas. *pop* = ambil piring paling atas. *peek/top* = cuma ngintip piring atas tanpa diambil.
-> - *TOP* = jari yang nunjuk piring paling atas. Awalnya -1 artinya "belum ada piring".
-> - *Overflow (tumpukan penuh)* = piring sudah mentok 100, tidak bisa tambah lagi.
-> - *Underflow (tumpukan kosong)* = mau ambil piring tapi piringnya tidak ada.
+> **Istilah penting:**
+> - **Tumpukan (*stack*)** menyimpan dan mengambil elemen melalui bagian atas.
+> - **LIFO (*Last In, First Out*)** berarti elemen terakhir yang masuk akan keluar lebih dahulu.
+> - Operasi **`push`** menambahkan elemen, **`pop`** mengambil dan menghapus elemen teratas, sedangkan **`peek`/`top`** hanya membaca elemen teratas.
+> - Variabel **`TOP`** menyimpan indeks elemen teratas. Nilai `-1` menandakan tumpukan kosong.
+> - **Overflow** terjadi ketika program menambahkan elemen ke tumpukan yang penuh. **Underflow** terjadi ketika program mengambil elemen dari tumpukan yang kosong.
 
-**Penjelasan detail (pakai kalimat pendek):**
+**Penjelasan program:**
 
 - `int data[MAX]` — memori **statis** 100 int di stack (bukan heap). Alokasi O(1) sekaligus, cache-friendly (elemen bersebelahan → CPU prefetcher bekerja optimal). Harga: kapasitas tetap; `MAX` terlalu besar = buang memori, terlalu kecil = overflow.
 - `TOP = -1` — trik agar `++TOP` pertama menjadi 0 (indeks valid pertama). Alternatif `TOP = 0` = "jumlah elemen" juga populer (`data[TOP++] = x`), tapi konvensi -1 dipakai modul ini konsisten dengan Gambar 3.
@@ -182,9 +187,9 @@ pop() saat kosong = -1 (muncul Underflow!)
 - **Overflow vs Underflow:** overflow = push saat penuh (data akan hilang/tertulis liar tanpa guard); underflow = pop/peek saat kosong (mengembalikan sampah). Kedua guard mencetak pesan + return sentinel `-1` — untuk produksi, lempar exception lebih baik.
 - **Trace:** push(10) → TOP=0 `[10]`; push(20) → TOP=1 `[10,20]`; peek → 20 (TOP tetap 1); pop → return 20, TOP=0; pop → return 10, TOP=-1; pop → "Underflow!".
 
-### 4.2 Berbasis Linked List (dinamis, tanpa overflow — pratinjau Modul 4)
+### 4.2 Implementasi Berbasis Senarai Berantai
 
-**Tujuan kode:** stack yang tumbuh sesuai kebutuhan — tiap push = `insertFirst`, tiap pop = `deleteFirst` dari Modul 4. Ujung stack = head list. Konsep Node/`next` dibahas tuntas di Modul 4; di sini cukup pahami polanya.
+**Tujuan program:** Program membuat tumpukan yang dapat bertambah sesuai kebutuhan memori. Operasi `push` menggunakan pola `insertFirst`, sedangkan operasi `pop` menggunakan pola `deleteFirst`. Variabel `head` pada senarai menjadi bagian teratas tumpukan. Modul 4 akan membahas konsep `Node` dan `next` secara lebih rinci.
 
 ```cpp
 #include <iostream>
@@ -253,14 +258,14 @@ Underflow!
 pop() saat kosong = -1
 ```
 
-> **Kata sulit = arti mudah:**
-> - *Linked List (senarai berantai)* = gerbong kereta. Tiap gerbong bawa barang (`data`) + sambungan ke gerbong depan (`next`).
-> - *Node* = satu gerbong.
-> - *Dinamis* = panjang kereta bisa tambah/kurang kapan saja. Tidak harus tentukan 100 dari awal.
-> - *Heap (gudang memori bebas)* = tempat bikin gerbong baru pakai `new`. Jangan lupa bongkar pakai `delete` biar tidak bocor.
-> - *Memory leak (memori bocor)* = bikin gerbong baru terus tapi tidak pernah dibongkar. Lama-lama gudang penuh.
+> **Istilah penting:**
+> - **Senarai berantai (*linked list*)** menghubungkan sejumlah simpul melalui penunjuk `next`.
+> - **Simpul (*node*)** menyimpan data dan penunjuk ke simpul berikutnya.
+> - Struktur **dinamis** dapat bertambah atau berkurang selama program berjalan.
+> - **Heap** merupakan area memori yang digunakan oleh alokasi dinamis melalui `new` dan dibebaskan melalui `delete`.
+> - **Kebocoran memori (*memory leak*)** terjadi ketika program tidak membebaskan memori yang sudah tidak digunakan.
 
-**Penjelasan detail (pakai kalimat pendek):**
+**Penjelasan program:**
 
 - `push` **tidak butuh cek penuh** — selama gudang memori masih ada, selalu muat. Caranya sama seperti `insertFirst`: gerbong baru sambung ke atas lama, lalu atas pindah ke gerbong baru.
 - `pop` menyimpan `v = tmp->data` **sebelum** `delete tmp` — urutan yang jika dibalik (delete dulu baru baca) menjadi use-after-free. Pola simpan-maju-hapus-kembalikan ini sama persis dengan `deleteFirst` Modul 4.
@@ -275,21 +280,21 @@ pop() saat kosong = -1
 
 > Praktik industri: `std::stack` (default berbasis `deque`) memakai strategi array yang tumbuh otomatis — gabungan kelebihan keduanya.
 
-## 5. Studi Kasus 1: Infix ↔ Postfix ↔ Prefix (bolak-balik)
+## 5. Studi Kasus 1: Konversi Infiks, Postfiks, dan Prefiks
 
-**Latar (kalimat pendek):** manusia biasa tulis `A+B` (tanda di tengah). Komputer lebih gampang hitung kalau tanda di belakang `AB+` atau di depan `+AB`. Tugas kita: ubah bolak-balik pakai tumpukan.
+**Latar belakang:** Manusia umumnya menulis operator di antara operand, seperti `A+B`. Notasi tersebut disebut infiks. Sistem komputasi juga menggunakan bentuk postfiks `AB+` atau prefiks `+AB` karena kedua bentuk tersebut tidak memerlukan aturan prioritas tambahan saat dievaluasi. Studi kasus ini menggunakan tumpukan untuk mengonversi ketiga notasi tersebut.
 
-> **Kata sulit = arti mudah:**
-> - *infix (tengah)* = tanda di tengah: `A+B`. Cara manusia.
-> - *postfix (belakang)* = tanda di belakang: `AB+`. Cara komputer.
-> - *prefix (depan)* = tanda di depan: `+AB`. Cara komputer lain.
-> - *precedence (urutan kuat)* = kali/bagi lebih kuat dari tambah/kurang. Jadi `A+B*C` artinya `A+(B*C)`, bukan `(A+B)*C`.
-> - *associative (arah kumpul)* = kalau kuatnya sama, kumpul dari mana dulu. `A+B+C` kumpul dari kiri `(A+B)+C`. `A^B^C` kumpul dari kanan `A^(B^C)`.
+> **Istilah penting:**
+> - Notasi **infiks** menempatkan operator di antara operand, seperti `A+B`.
+> - Notasi **postfiks** menempatkan operator setelah operand, seperti `AB+`.
+> - Notasi **prefiks** menempatkan operator sebelum operand, seperti `+AB`.
+> - **Prioritas operator (*precedence*)** menentukan operator yang dikerjakan lebih dahulu. Pada `A+B*C`, perkalian dikerjakan sebelum penjumlahan.
+> - **Asosiativitas** menentukan arah evaluasi operator dengan prioritas yang sama. `A+B+C` dievaluasi dari kiri, sedangkan `A^B^C` dievaluasi dari kanan.
 
-**Aturan cepat (ingat 3 baris ini):**
-1. Huruf/angka langsung ke hasil. Tidak mampir ke stack.
-2. `(` didorong. `)` keluarkan semua sampai ketemu `(`.
-3. Operator baru keluarkan operator lama yang lebih kuat (atau sama kuat, lihat aturan pangkat `^`).
+**Aturan konversi:**
+1. Algoritma menambahkan operand langsung ke hasil.
+2. Algoritma mendorong `(` ke tumpukan dan mengeluarkan operator ketika menemukan `)` sampai `(` ditemukan.
+3. Algoritma mengeluarkan operator lama yang memiliki prioritas lebih tinggi. Untuk prioritas yang sama, algoritma juga mempertimbangkan asosiativitas operator `^`.
 
 ```cpp
 #include <iostream>
@@ -519,9 +524,9 @@ Undo: Halo
 Redo: Halo Dunia
 ```
 
-> **Kata sulit = arti mudah:** *undo* = batalkan ketikan terakhir (Ctrl+Z). *redo* = kembalikan yang dibatalkan (Ctrl+Y). *snapshot* = foto isi teks tiap selesai ketik.
+> **Istilah penting:** **Undo** membatalkan perubahan terakhir, **redo** mengembalikan perubahan yang dibatalkan, dan **snapshot** menyimpan keadaan teks setelah suatu tindakan.
 
-**Penjelasan alur + isi stack (kalimat pendek):**
+**Penjelasan alur dan isi tumpukan:**
 
 1. **Setup:** `undo = [""]` (snapshot kosong wajib ada sebagai dasar; tanpanya undo terakhir akan mengosongkan stack dan `top()` crash). `redo = []`.
 2. **Mengetik:** setiap selesai aksi (bukan per huruf, demi hemat memori), push snapshot baru. Setelah dua aksi: `undo = ["", "Halo", "Halo Dunia"]`, teks = "Halo Dunia".
@@ -530,16 +535,16 @@ Redo: Halo Dunia
 5. **Aturan yang disederhanakan di sini:** mengetik baru setelah undo seharusnya **mengosongkan redo** (cabang redo hangus — perilaku VS Code/Word). Versi lengkap: tiap aksi ketik baru → `while (!redo.empty()) redo.pop();`.
 6. **Biaya:** menyimpan seluruh string tiap aksi = O(n) memori per aksi. Editor nyata menyimpan **delta** (operasi insert/delete + posisi), bukan snapshot penuh — optimasi yang bagus untuk Tugas.
 
-### Studi Kasus 3: Kalkulator Prefix & Postfix
+### Studi Kasus 3: Kalkulator Prefiks dan Postfiks
 
-**Ide (kalimat pendek):** kalkulator biasa baca `2 + 3`. Kalkulator postfix baca `2 3 +`. Kalkulator prefix baca `+ 2 3`. Tidak ada kurung. Cara hitung cuma pakai satu tumpukan angka.
+**Gagasan utama:** Kalkulator infiks membaca `2 + 3`, kalkulator postfiks membaca `2 3 +`, dan kalkulator prefiks membaca `+ 2 3`. Evaluasi notasi postfiks dan prefiks tidak memerlukan tanda kurung serta hanya membutuhkan satu tumpukan angka.
 
-> **Kata sulit = arti mudah:**
-> - *postfix (belakang)* = tanda di belakang: `2 3 +`. Baca dari kiri.
-> - *prefix (depan)* = tanda di depan: `+ 2 3`. Baca dari kanan (belakang).
-> - *operand (angka)* = angka yang didorong ke tumpukan.
-> - *operator (tanda)* = `+ - * / ^`. Kalau ketemu tanda, ambil 2 angka teratas lalu hitung.
-> - *evaluasi (hitung)* = kerja menghitung sampai dapat hasil.
+> **Istilah penting:**
+> - Evaluasi **postfiks** membaca ekspresi dari kiri ke kanan.
+> - Evaluasi **prefiks** membaca ekspresi dari kanan ke kiri.
+> - **Operand** merupakan nilai yang didorong ke tumpukan.
+> - **Operator** seperti `+`, `-`, `*`, `/`, dan `^` mengambil dua operand teratas untuk menghasilkan nilai baru.
+> - **Evaluasi** merupakan proses menghitung ekspresi sampai menghasilkan satu nilai akhir.
 
 **Aturan hitung (ingat 2 baris ini):**
 1. Postfix: jalan dari kiri. Angka → dorong. Tanda → ambil 2 (`b` atas, `a` bawahnya), hitung `a tanda b`, dorong hasil.
@@ -717,9 +722,9 @@ Hasil = 11 (harusnya 11 juga)
 
 ## 6. Tugas Praktikum 🧩
 
-> Kerjakan sesuai level. Setiap tugas wajib dikumpulkan sebagai **satu file `.cpp` + screenshot output + analisis singkat di laporan**. Kode yang tidak bisa dicompile (`g++ -std=c++17`) otomatis bernilai nol.
+> Kerjakan tugas sesuai tingkat kesulitan yang ditentukan. Kumpulkan setiap tugas dalam bentuk **satu berkas `.cpp`, tangkapan layar keluaran, dan analisis singkat dalam laporan**. Pastikan `g++ -std=c++17` dapat mengompilasi program tanpa galat.
 
-### 🟢 Level Beginner — *Memahami Gerakan Dasar*
+### 🟢 Tingkat Dasar — *Memahami Langkah Dasar*
 
 **Tugas B1: Stack Array Manual + Jejak TOP (wajib semua mahasiswa).**
 1. Salin class `StackArray` dari kode 4.1 ke file `stack_b1.cpp`.
@@ -734,7 +739,7 @@ Hasil = 11 (harusnya 11 juga)
 3. Di laporan jelaskan dengan 1 paragraf: mengapa stack cocok untuk "membalik urutan"?
 *Kriteria nilai:* output benar (50%), minimal 3 uji kasus terdokumentasi (25%), penjelasan tepat (25%).
 
-### 🟡 Level Medium — *Menerapkan Pola Klasik*
+### 🟡 Tingkat Menengah — *Menerapkan Pola Klasik*
 
 **Tugas M1: Pemeriksa Kurung Seimbang `{[()]}`.**
 1. Implementasikan fungsi `bool isBalanced(string s)` memakai `std::stack<char>`: untuk setiap kurung buka (`{[( `) di-push; untuk kurung tutup, cek top cocok lalu pop; jika stack kosong saat tutup datang → tidak seimbang.
@@ -749,7 +754,7 @@ Hasil = 11 (harusnya 11 juga)
 4. Bonus: salin kode `konversi.cpp`, uji `infixToPrefix` dan `prefixToInfix` untuk `A+B*C` dan `(A+B)*C`. Tulis 2 kalimat: apa beda cara kerja prefix vs postfix?
 *Kriteria nilai:* hitung benar (50%), atasi error (25%), jejak + bonus prefix (25%).
 
-### 🔴 Level Expert — *Menggabungkan & Menganalisis*
+### 🔴 Tingkat Lanjut — *Menggabungkan dan Menganalisis*
 
 **Tugas E1: Dua Stack dalam Satu Array (interview classic).**
 1. Implementasikan class `TwoStacks` berkapasitas `MAX`: stack1 tumbuh dari kiri (`top1` mulai -1, naik), stack2 tumbuh dari kanan (`top2` mulai MAX, turun). Full saat `top1 + 1 == top2`.
